@@ -1,0 +1,171 @@
+.container {
+  max-width: 720px;
+  margin: 4rem auto;
+  padding: 0 1.5rem;
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.divider {
+  border: none;
+  height: 1px;
+  background: #eee;
+  margin: 2rem 0;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.avatarList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.avatarOption {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.avatarOption:hover {
+  transform: scale(1.05);
+}
+
+.avatarSelected {
+  border: 3px solid #000;
+}
+
+.button {
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background-color 0.3s;
+}
+
+.button:hover {
+  background-color: #222;
+}
+
+.logout {
+  background-color: #e67e22;
+  margin-right: 1rem;
+}
+
+.logout:hover {
+  background-color: #d35400;
+}
+
+.delete {
+  background-color: #e74c3c;
+}
+
+.delete:hover {
+  background-color: #c0392b;
+}
+
+.message {
+  text-align: center;
+  font-weight: 500;
+  color: #333;
+  margin-top: 2rem;
+}
+
+.loading {
+  text-align: center;
+  padding-top: 4rem;
+  font-size: 1.2rem;
+}
+.userInfo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.avatarNote {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+.toast {
+  position: fixed;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 90%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #333;
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease-in-out;
+  z-index: 1000;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.toastVisible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toastSuccess {
+  background-color: #d1f5d3; /* soft green */
+  color: #207744;
+}
+
+.toastError {
+  background-color: #fddede; /* soft red */
+  color: #a92c2c;
+}
+
+.toastInfo {
+  background-color: #dbeeff; /* soft blue */
+  color: #2c5aa9;
+}
+
+
+.toastIcon {
+  font-size: 1.25rem;
+  line-height: 1;
+}

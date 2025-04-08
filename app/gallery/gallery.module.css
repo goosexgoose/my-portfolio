@@ -1,0 +1,141 @@
+/* === Gallery Page === */
+.galleryContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 1rem;
+    background-color: #fff;
+    color: #111;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .galleryContainer h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+  }
+  
+  .galleryContainer h2 {
+    text-align: center;
+    margin: 3rem 0 1rem;
+    font-size: 2rem;
+  }
+  
+  .galleryContainer h3 {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: #666;
+  }
+  
+  /* === Image Layout === */
+  .imageRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .galleryImage {
+    border-radius: 10px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .galleryImage:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* === Sections === */
+  .recentSection {
+    margin-bottom: 4rem;
+  }
+  
+  .privateSection {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #ddd;
+  }
+  
+  .carouselSection {
+    margin-bottom: 3rem;
+  }
+  
+  .welcome {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: 500;
+    color: #444;
+  }
+  
+  /* === Login/Register Form Overlay (under title, over blur) === */
+  .previewWrapper {
+    position: relative;
+  }
+  
+  .authOverlay {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  /* === Preview Blur Container === */
+  .previewContainer {
+    transition: filter 0.6s ease;
+  }
+  
+  .previewContainer.blurred {
+    filter: blur(8px);
+    pointer-events: none;
+  }
+  
+  /* === Divider Line (optional use) === */
+  .dividerLine {
+    border: none;
+    border-top: 1px solid #ddd;
+    width: 100%;
+    max-width: 600px;
+    margin: 2rem auto;
+  }
+  
+  /* === Responsive === */
+  @media (max-width: 768px) {
+    .galleryContainer {
+      padding: 2rem 1rem;
+    }
+  
+    .galleryContainer h1 {
+      font-size: 2rem;
+    }
+  
+    .galleryContainer h2 {
+      font-size: 1.5rem;
+    }
+  
+    .galleryContainer h3 {
+      font-size: 1rem;
+    }
+  
+    .galleryImage {
+      width: 100%;
+      height: auto;
+    }
+  
+    .authOverlay {
+      position: relative;
+      transform: none;
+      left: auto;
+      width: 100%;
+      margin-top: 1.5rem;
+    }
+  }
+  

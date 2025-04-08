@@ -1,0 +1,352 @@
+/* === Global === */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f2f2f2;
+}
+
+/* === Homepage Layout === */
+.intro-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 3rem auto;
+  padding: 0 2rem;
+  max-width: 1200px;
+}
+
+.intro-text {
+  flex: 1 1 50%;
+  max-width: 600px;
+}
+
+.intro-image {
+  flex: 1 1 40%;
+  max-width: 500px;
+  text-align: right;
+}
+
+.intro-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.btn {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+  margin-top: 2rem;
+}
+
+.btn:hover {
+  background-color: #333;
+}
+
+/* === Typography === */
+h2 {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.card-subtitle {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.card-text {
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.highlight {
+  background-color: #000;
+  color: #fff;
+  padding: 0.2em 0.4em;
+  display: inline-block;
+  font-weight: 500;
+}
+
+/* Employment Section */
+.employment {
+  background-color: #ffffff;
+  padding: 2.5rem 2rem 3rem 2rem; /* 上下 padding 更紧凑 */
+  text-align: center;
+  border-radius: 16px;
+  margin: 3rem auto; /* 原本是 5rem，改小 */
+  max-width: 1000px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+}
+
+
+.employment-header {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-top: 0; /* 取消多余顶部间距 */
+  margin-bottom: 2rem;
+  color: #333;
+  font-family: 'Poppins', sans-serif;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+
+.employment-group h4 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.logo-row {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.logo-row img {
+  max-height: 70px;
+  width: auto;
+  transition: transform 0.3s ease;
+  padding: 0.5rem;
+}
+
+.logo-row img:hover {
+  transform: scale(1.05);
+}
+
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+  .intro-section {
+    flex-direction: column-reverse;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .intro-image {
+    text-align: center;
+  }
+
+  .intro-text, .intro-image {
+    max-width: 100%;
+  }
+
+  h2 {
+    font-size: 2.5rem;
+  }
+
+  .card-subtitle {
+    font-size: 1.5rem;
+  }
+}
+
+/* === Navbar === */
+.topnav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+  background-color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 0 1rem;
+}
+
+/* === Left group: nav links and avatar === */
+.nav-left {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* === Each link, including avatar === */
+.nav-left a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;             /* Ensures full navbar height */
+  padding: 0 16px;
+  font-size: 17px;
+  text-decoration: none;
+  color: #000;
+  background-color: transparent;
+  box-sizing: border-box;
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.nav-left a:hover {
+  background-color: #e0e0e0;
+  color: black;
+}
+
+.nav-left a.active {
+  background-color: #e0e0e0;
+  font-weight: 600;
+  border-bottom: 2px solid black;
+}
+
+/* Underline for avatar */
+.nav-left a.active .navbar-avatar {
+  position: relative;
+}
+
+.nav-left a.active .navbar-avatar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: black;
+  border-radius: 1px;
+}
+
+/* Avatar image */
+.navbar-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Logo on far right */
+.Logo {
+  display: flex;
+  align-items: center;
+  padding-left: 1rem;
+}
+
+.Logo img {
+  width: 80px;
+  height: auto;
+}
+
+/* === Responsive Navbar === */
+.topnav .icon {
+  display: none;
+}
+
+@media screen and (max-width: 600px) {
+  .topnav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-left {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nav-left a {
+    width: 100%;
+    padding: 12px 16px;
+    text-align: left;
+  }
+
+  .topnav .icon {
+    display: block;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+  }
+}
+
+/* === Burger Icon === */
+.container {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.bar1, .bar2, .bar3 {
+  width: 25px;
+  height: 3px;
+  background-color: #000000;
+  margin: 4px 0;
+  transition: 0.4s;
+}
+
+.change .bar1 {
+  transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.change .bar2 {
+  opacity: 0;
+}
+
+.change .bar3 {
+  transform: rotate(45deg) translate(-4px, -5px);
+}
+
+
+.footer {
+  background-color: #ffffff;
+  padding: 0.5rem 0 0.5rem 0; /* ↓ tighter padding */
+  margin-top: 0;
+  text-align: center;
+  color: #111;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.8125rem; /* smaller text */
+  line-height: 1.2;
+}
+
+.footer h5 {
+  margin: 0.2rem 0 0.3rem;
+  font-weight: 400;
+  font-size: 0.95rem;
+}
+
+.underline {
+  width: 50px;
+  height: 2px;
+  background-color: #333;
+  margin: 0 auto 0.75rem auto;
+}
+
+.social-icons {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto 0.5rem auto;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.social-icons a {
+  text-decoration: none;
+  color: white;
+  background-color: rgba(24, 24, 24, 0.6);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.social-icons a:hover {
+  background-color: #000;
+}
+
+.copyright {
+  font-size: 0.7rem;
+  color: #444;
+  margin-top: 0.2rem;
+}

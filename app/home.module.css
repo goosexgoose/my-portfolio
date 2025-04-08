@@ -1,0 +1,62 @@
+h2 {
+    font-size: 5em;
+    font-family: poppins;
+    margin-bottom: 30px;
+  }
+  
+  .contentSection {
+    max-width: 75%;
+    margin: auto;
+    margin-bottom: 50px;
+  }
+  
+  .clearfix {
+    margin: auto;
+    padding: 20px;
+  }
+  
+  .profileImage {
+    float: left;
+    margin-right: 20px;
+    height: auto;
+    width: 40%;
+  }
+  
+  .highlight {
+    background-color: #000000;
+    display: inline;
+    padding: 0.2em 0.4em;
+    font-size: 25px;
+    font-family: poppins;
+    color: rgb(230, 230, 230);
+  }
+  
+  .card {
+    text-align: center;
+    margin-bottom: 40px;
+    cursor: default;
+  }
+  
+  .cardHeader {
+    background-color: rgb(230, 230, 230);
+    color: rgb(0, 0, 0);
+    font-size: 24px;
+    padding: 10px;
+  }
+  
+  .cardBody img {
+    margin: 20px;
+    height: auto;
+    max-height: 90px;
+  }
+  
+  .cardSubtitle {
+    font-size: 3.5em;
+    margin-bottom: 0.5em;
+  }
+  
+  .cardText {
+    font-size: 18px;
+    margin-bottom: 0.5em;
+  }
+  

@@ -1,0 +1,84 @@
+/* === Login Page Styles === */
+.loginContainer {
+    max-width: 500px;
+    margin: 4rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .loginContainer h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  .loginContainer form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .loginContainer label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+  
+  .loginContainer input {
+    padding: 0.75rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .loginContainer .btn {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .loginContainer .btn:hover {
+    background-color: #333;
+  }
+  
+  .loginContainer .link {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .loginContainer .link a {
+    color: #000;
+    text-decoration: underline;
+  }
+  
+  .googleBtn {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .googleBtn:hover {
+    background-color: #f2f2f2;
+  }
+  
