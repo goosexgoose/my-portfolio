@@ -3,6 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './projects.module.css';
+import { ReactElement } from 'react';
 
 const codingProjects = [
   {
@@ -65,7 +66,7 @@ interface Project {
     demo?: string;
 }
 
-const renderProjectGrid = (projects: Project[]): JSX.Element => (
+const renderProjectGrid = (projects: Project[]): ReactElement => (
     <div className={styles.grid}>
         {projects.map((project, index) => (
             <div className={styles.card} key={index}>

@@ -12,6 +12,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "emailjs-com": "^3.2.0",
     "firebase": "^11.6.0",
     "framer-motion": "^12.6.3",
     "gsap": "^3.12.7",
@@ -22,11 +23,12 @@
     "react-intersection-observer": "^9.16.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19",
-    "tailwindcss": "^4",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
 }
