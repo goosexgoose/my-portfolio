@@ -16,7 +16,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import Modal from '../components/Modal';
+import Modal from '@/components/Modal';
 
 function SortableBlock({
   id,
@@ -81,6 +81,17 @@ export default function ProjectManager() {
     if (editingProject?.layout) setLayoutBlocks(editingProject.layout);
     else setLayoutBlocks([]);
   }, [editingProject]);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setEditingProject(null);
+      }
+    };
+  
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, []);
 
   const fetchProjects = async () => {
     const snapshot = await getDocs(collection(db, 'projects'));
@@ -254,46 +265,96 @@ export default function ProjectManager() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredProjects.map(project => (
-          <div key={project.id} className="border p-4 rounded bg-white relative">
-            <input
-              type="checkbox"
-              checked={selectedProjects.includes(project.id!)}
-              onChange={() => toggleSelect(project.id!)}
-              className="absolute top-3 left-3"
-            />
-            <h3 className="text-lg font-semibold pl-6">
-              {project.status === 'published' ? (
-                <a href={`/projects/${project.id}`} className="text-blue-600 underline">
-                  {project.title}
-                </a>
-              ) : (
-                project.title
-              )}
-            </h3>
-            <p className="text-sm text-gray-600 pl-6">
-              {project.status} —{' '}
-              {typeof project.updatedAt?.toDate === 'function'
-                ? project.updatedAt.toDate().toLocaleString()
-                : 'N/A'}
-            </p>
-            <div className="pl-6 mt-2">
-              <p className="text-xs text-gray-500">Category: {project.category}</p>
-              {project.tech?.length > 0 && (
-                <p className="text-xs text-gray-500">Skills: {project.tech.join(', ')}</p>
-              )}
-              <div className="flex gap-2 mt-2">
-                <button onClick={() => setEditingProject(project)} className="text-blue-600 underline text-sm">Edit</button>
-                <button onClick={async () => {
-                  await deleteDoc(doc(db, 'projects', project.id!));
-                  fetchProjects();
-                }} className="text-red-500 underline text-sm">Delete</button>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  {filteredProjects.map((project) => (
+    <div key={project.id} className="border p-4 rounded-lg bg-white shadow-sm hover:shadow-md transition-all relative">
+      <div className="absolute top-2 left-2">
+        <input
+          type="checkbox"
+          checked={selectedProjects.includes(project.id!)}
+          onChange={() => toggleSelect(project.id!)}
+          className="accent-blue-500"
+        />
       </div>
+
+      <div className="pl-6 pr-2 space-y-2">
+        {/* 🔗 标题 + 状态标签 */}
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold text-gray-900">
+            {project.status === 'published' ? (
+              <a href={`/projects/${project.id}`} className="text-blue-700 underline">
+                {project.title}
+              </a>
+            ) : (
+              project.title
+            )}
+          </h3>
+          <span
+            className={`text-xs px-2 py-1 rounded font-semibold uppercase ${
+              project.status === 'published'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-yellow-100 text-yellow-700'
+            }`}
+          >
+            {project.status}
+          </span>
+        </div>
+
+        {/* 🕒 更新时间 */}
+        <p className="text-sm text-gray-500">
+          Last Updated:{' '}
+          {typeof project.updatedAt?.toDate === 'function'
+            ? project.updatedAt.toDate().toLocaleString()
+            : 'N/A'}
+        </p>
+
+        {/* 🖼️ 封面图 */}
+        {project.coverUrl && (
+          <img
+            src={project.coverUrl}
+            alt="cover"
+            className="w-full h-32 object-cover rounded-md border"
+          />
+        )}
+
+        {/* 📂 分类 */}
+        <p className="text-sm text-gray-600 flex items-center gap-1">
+          {project.category === 'Coding' && '💻'}
+          {project.category === 'Localization' && '🌍'}
+          {project.category === 'Photography' && '📷'}
+          <span className="font-medium">{project.category}</span>
+        </p>
+
+        {/* 🛠️ 技能标签 */}
+        {project.tech?.length > 0 && (
+          <p className="text-sm text-gray-600">
+            🛠️ <span className="font-medium">Skills:</span> {project.tech.join(', ')}
+          </p>
+        )}
+
+        {/* ✏️ 操作按钮 */}
+        <div className="flex justify-end gap-4 mt-4 text-sm">
+          <button
+            onClick={() => setEditingProject(project)}
+            className="text-blue-600 hover:underline"
+          >
+            Edit
+          </button>
+          <button
+            onClick={async () => {
+              await deleteDoc(doc(db, 'projects', project.id!));
+              fetchProjects();
+            }}
+            className="text-red-500 hover:underline"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
 
       <Modal isOpen={!!editingProject} onClose={() => setEditingProject(null)} title="Edit Project">
   {editingProject && (

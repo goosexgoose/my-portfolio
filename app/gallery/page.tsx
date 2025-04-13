@@ -5,7 +5,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import Image from 'next/image';
 import styles from './gallery.module.css';
 import { auth } from '@/lib/firebaseClient';
-import LoginRegisterForm from '../components/LoginRegisterForm';
+import LoginRegisterForm from '@/components/LoginRegisterForm';
 
 export default function GalleryPage() {
   const [user, setUser] = useState<{ displayName?: string; email?: string } | null>(null);
