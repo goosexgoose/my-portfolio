@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { db } from '@/lib/firebaseClient';
 import { uploadToCloudinary } from '@/lib/uploadToCloudinary';
 import {
@@ -10,7 +10,7 @@ import {
 import { toast } from 'react-hot-toast';
 import {
   DndContext, closestCenter,
-} from '@dnd-kit/core';
+DragEndEvent } from '@dnd-kit/core';
 import {
   arrayMove, SortableContext, useSortable,
   verticalListSortingStrategy,
@@ -45,7 +45,6 @@ function SortableBlock({
   );
 }
 
-
 type Block =
   | { type: 'text' | 'heading' | 'quote' | 'code'; content: string }
   | { type: 'image' | 'video'; url: string };
@@ -60,44 +59,58 @@ interface Project {
   demo?: string;
   coverUrl?: string;
   createdAt?: Timestamp;
+  updatedAt?: Timestamp;
   status?: 'published' | 'draft' | 'deleted';
   statusUpdatedAt?: Timestamp;
   images?: string[];
   videos?: string[];
   layout?: Block[];
 }
-
 export default function ProjectManager() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [layoutBlocks, setLayoutBlocks] = useState<Block[]>([]);
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+  const [filterCategory, setFilterCategory] = useState<string>('All');
+  const [filterStatus, setFilterStatus] = useState<string>('All');
 
   useEffect(() => { fetchProjects(); }, []);
+
+  useEffect(() => {
+    if (editingProject?.layout) setLayoutBlocks(editingProject.layout);
+    else setLayoutBlocks([]);
+  }, [editingProject]);
 
   const fetchProjects = async () => {
     const snapshot = await getDocs(collection(db, 'projects'));
     const list = snapshot.docs.map(doc => {
       const data = doc.data();
+      let parsedLayout = [];
+  
+      try {
+        parsedLayout = typeof data.layout === 'string' ? JSON.parse(data.layout) : data.layout || [];
+      } catch (e) {
+        console.warn('Layout parsing error for project:', doc.id);
+      }
+  
       return {
         id: doc.id,
         ...data,
-        layout: typeof data.layout === 'string' ? JSON.parse(data.layout) : data.layout,
+        layout: parsedLayout,
       };
     }) as Project[];
+  
     setProjects(list);
   };
+  
 
   const saveProject = async (status: 'draft' | 'published') => {
     if (!editingProject) return;
 
     if (status === 'published') {
       const required = editingProject.title?.trim() && editingProject.description?.trim();
-      if (!required) {
-        toast.error('Please fill in title and description to publish.');
-        return;
-      }
+      if (!required) return toast.error('Please fill in title and description to publish.');
     }
 
     let coverUrl = editingProject.coverUrl ?? '';
@@ -107,18 +120,19 @@ export default function ProjectManager() {
       ...editingProject,
       coverUrl,
       layout: layoutBlocks,
+      updatedAt: Timestamp.now(),
       status,
       statusUpdatedAt: Timestamp.now(),
     };
 
-    const plainProjectData = { ...projectData, layout: JSON.stringify(projectData.layout) };
+    const plainData = { ...projectData, layout: JSON.stringify(projectData.layout) };
 
     if (editingProject.id) {
-      await updateDoc(doc(db, 'projects', editingProject.id), plainProjectData);
+      await updateDoc(doc(db, 'projects', editingProject.id), plainData);
       toast.success('Project updated');
     } else {
       await addDoc(collection(db, 'projects'), {
-        ...plainProjectData,
+        ...plainData,
         createdAt: Timestamp.now(),
       });
       toast.success('Project added');
@@ -130,58 +144,16 @@ export default function ProjectManager() {
     fetchProjects();
   };
 
-  const handleAddLayoutBlock = async (type: Block['type']) => {
-    if (['text', 'heading', 'quote', 'code'].includes(type)) {
-      setLayoutBlocks(prev => [...prev, { type, content: '' } as Block]);
-    } else {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = type === 'image' ? 'image/*' : 'video/*';
-      input.onchange = async (e: any) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const url = await uploadToCloudinary(file, 'portfolio/layouts');
-        setLayoutBlocks(prev => [...prev, { type, url } as Block]);
-      };
-      input.click();
-    }
-  };
-
-  const updateTextBlock = (index: number, content: string) => {
-    setLayoutBlocks(prev => {
-      const updated = [...prev];
-      if ('content' in updated[index]) {
-        updated[index] = { ...updated[index], content };
-      }
-      return updated;
+  const filteredProjects = useMemo(() => {
+    return projects.filter(p => {
+      const matchCat = filterCategory === 'All' || p.category === filterCategory;
+      const matchStat = filterStatus === 'All' || p.status === filterStatus;
+      return matchCat && matchStat;
     });
-  };
-
-  const removeLayoutBlock = (index: number) => {
-    setLayoutBlocks(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleDragEnd = (event: any) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    const oldIndex = parseInt(active.id);
-    const newIndex = parseInt(over.id);
-    setLayoutBlocks(blocks => arrayMove(blocks, oldIndex, newIndex));
-  };
-
-  useEffect(() => {
-    if (editingProject?.layout) setLayoutBlocks(editingProject.layout);
-    else setLayoutBlocks([]);
-  }, [editingProject]);
+  }, [projects, filterCategory, filterStatus]);
 
   const toggleSelect = (id: string) => {
     setSelectedProjects(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
-  };
-
-  const selectAll = () => {
-    const all = projects.map(p => p.id!).filter(Boolean);
-    const allSelected = all.every(id => selectedProjects.includes(id));
-    setSelectedProjects(allSelected ? [] : all);
   };
 
   const deleteSelected = async () => {
@@ -193,28 +165,97 @@ export default function ProjectManager() {
     fetchProjects();
   };
 
+  function handleAddLayoutBlock(type: Block['type']) {
+    if (['text', 'heading', 'quote', 'code'].includes(type)) {
+      setLayoutBlocks(prev => [
+        ...prev,
+        type === 'text' || type === 'heading' || type === 'quote' || type === 'code'
+          ? { type, content: '' }
+          : { type, url: '' },
+      ]);
+    } else {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = type === 'image' ? 'image/*' : 'video/*';
+      input.onchange = async (e: any) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+          const url = await uploadToCloudinary(file, 'portfolio/layouts');
+          setLayoutBlocks(prev => [
+            ...prev,
+            type === 'image' || type === 'video' ? { type, url } : null,
+          ].filter(Boolean) as Block[]);
+        } catch (err) {
+          toast.error('Upload failed');
+        }
+      };
+      input.click();
+    }
+  }
+  
+  function handleDragEnd(event: DragEndEvent): void {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      setLayoutBlocks((prev) => {
+        const oldIndex = active.id as number;
+        const newIndex = over?.id as number;
+        return arrayMove(prev, oldIndex, newIndex);
+      });
+    }
+  }
+  function updateTextBlock(index: number, value: string): void {
+    setLayoutBlocks((prev) =>
+      prev.map((block, i) =>
+        i === index && 'content' in block ? { ...block, content: value } : block
+      )
+    );
+  }
+  function removeLayoutBlock(index: number): void {
+    setLayoutBlocks((prev) => prev.filter((_, i) => i !== index));
+  }
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <button
-          onClick={() => setEditingProject({ title: '', description: '', tech: [], category: 'Coding', status: 'draft' })}
+          onClick={() =>
+            setEditingProject({
+              title: '',
+              description: '',
+              tech: [],
+              category: 'Coding',
+              status: 'draft',
+            })
+          }
           className="px-4 py-2 bg-blue-600 text-white rounded"
-        >+ Add Project</button>
-
-        <div className="flex gap-3">
-          <button onClick={selectAll} className="px-4 py-2 border text-sm">
-            {selectedProjects.length === projects.length ? 'Unselect All' : 'Select All'}
-          </button>
+        >
+          + Add Project
+        </button>
+        <div className="flex items-center gap-3">
+          <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="border rounded px-2 py-1 text-sm">
+            <option value="All">All Categories</option>
+            <option value="Coding">Coding</option>
+            <option value="Localization">Game Localization</option>
+            <option value="Photography">Photography</option>
+          </select>
+          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="border rounded px-2 py-1 text-sm">
+            <option value="All">All Statuses</option>
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
           <button
             onClick={deleteSelected}
             disabled={!selectedProjects.length}
-            className="px-4 py-2 bg-red-600 text-white rounded text-sm"
-          >Delete Selected</button>
+            className="text-sm bg-red-600 text-white px-4 py-2 rounded"
+          >
+            Delete Selected
+          </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {projects.map(project => (
+        {filteredProjects.map(project => (
           <div key={project.id} className="border p-4 rounded bg-white relative">
             <input
               type="checkbox"
@@ -224,23 +265,31 @@ export default function ProjectManager() {
             />
             <h3 className="text-lg font-semibold pl-6">
               {project.status === 'published' ? (
-                <a href={`/projects/${project.id}`} className="text-blue-600 underline">{project.title}</a>
-              ) : project.title}
+                <a href={`/projects/${project.id}`} className="text-blue-600 underline">
+                  {project.title}
+                </a>
+              ) : (
+                project.title
+              )}
             </h3>
             <p className="text-sm text-gray-600 pl-6">
-              {project.status} — {typeof project.statusUpdatedAt?.toDate === 'function'
-                ? project.statusUpdatedAt.toDate().toLocaleString()
+              {project.status} —{' '}
+              {typeof project.updatedAt?.toDate === 'function'
+                ? project.updatedAt.toDate().toLocaleString()
                 : 'N/A'}
             </p>
-            <div className="flex gap-2 mt-2 pl-6">
-              <button onClick={() => setEditingProject(project)} className="text-blue-600 underline">Edit</button>
-              <button
-                onClick={async () => {
+            <div className="pl-6 mt-2">
+              <p className="text-xs text-gray-500">Category: {project.category}</p>
+              {project.tech?.length > 0 && (
+                <p className="text-xs text-gray-500">Skills: {project.tech.join(', ')}</p>
+              )}
+              <div className="flex gap-2 mt-2">
+                <button onClick={() => setEditingProject(project)} className="text-blue-600 underline text-sm">Edit</button>
+                <button onClick={async () => {
                   await deleteDoc(doc(db, 'projects', project.id!));
                   fetchProjects();
-                }}
-                className="text-red-500 underline"
-              >Delete</button>
+                }} className="text-red-500 underline text-sm">Delete</button>
+              </div>
             </div>
           </div>
         ))}
@@ -248,24 +297,94 @@ export default function ProjectManager() {
 
       <Modal isOpen={!!editingProject} onClose={() => setEditingProject(null)} title="Edit Project">
   {editingProject && (
+    
     <div className="space-y-4">
+      {/* 关闭按钮（右上角） */}
+      <button
+        onClick={() => setEditingProject(null)}
+        className="absolute top-3 right-3 text-2xl font-bold text-gray-400 hover:text-black"
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+      {/* ESC 快捷键监听 */}
+      <script suppressHydrationWarning>
+        {`(() => {
+          if (typeof window !== 'undefined') {
+            window.onkeydown = (e) => {
+              if (e.key === 'Escape') {
+                document.querySelector('[data-modal-close]')?.click();
+              }
+            };
+          }
+        })()`}
+      </script>
+      {/* 标题与描述 */}
       <input
         type="text"
         placeholder="Title"
         value={editingProject.title || ''}
-        onChange={(e) =>
-          setEditingProject({ ...editingProject, title: e.target.value })
-        }
+        onChange={(e) => setEditingProject({ ...editingProject, title: e.target.value })}
         className="w-full border p-2 rounded"
       />
       <textarea
         placeholder="Description"
         value={editingProject.description || ''}
+        onChange={(e) => setEditingProject({ ...editingProject, description: e.target.value })}
+        className="w-full border p-2 rounded"
+      />
+
+      {/* 技能标签 */}
+      <input
+        type="text"
+        placeholder="Skills (comma separated)"
+        value={editingProject.tech?.join(', ') || ''}
         onChange={(e) =>
-          setEditingProject({ ...editingProject, description: e.target.value })
+          setEditingProject({
+            ...editingProject,
+            tech: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
+          })
         }
         className="w-full border p-2 rounded"
       />
+
+      {/* 分类选择 */}
+      <select
+        value={editingProject.category}
+        onChange={(e) =>
+          setEditingProject({
+            ...editingProject,
+            category: e.target.value as Project['category'],
+          })
+        }
+        className="w-full border p-2 rounded"
+      >
+        <option value="Coding">Coding</option>
+        <option value="Localization">Game Localization</option>
+        <option value="Photography">Photography</option>
+      </select>
+
+      {/* 当前时间信息显示 */}
+      <div className="text-xs text-gray-500 flex justify-between">
+        <span>
+          Created:{' '}
+          {editingProject.createdAt?.toDate
+            ? editingProject.createdAt.toDate().toLocaleString()
+            : '—'}
+        </span>
+        <span>
+          Updated:{' '}
+          {editingProject.updatedAt?.toDate
+            ? editingProject.updatedAt.toDate().toLocaleString()
+            : '—'}
+        </span>
+      </div>
+
+      {/* 封面预览与上传 */}
+      {editingProject.coverUrl && !coverFile && (
+        <img src={editingProject.coverUrl} className="w-full rounded shadow mb-2" />
+      )}
       <input
         type="file"
         accept="image/*"
@@ -273,6 +392,7 @@ export default function ProjectManager() {
         className="w-full"
       />
 
+      {/* 布局编辑区域 */}
       <div className="space-y-2">
         <h4 className="text-md font-medium">📐 Project Layout</h4>
         <div className="flex gap-2 flex-wrap">
@@ -288,79 +408,83 @@ export default function ProjectManager() {
         </div>
 
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext
-            items={layoutBlocks.map((_, i) => i)}
-            strategy={verticalListSortingStrategy}
-          >
+          <SortableContext items={layoutBlocks.map((_, i) => i)} strategy={verticalListSortingStrategy}>
             <div className="space-y-3 mt-2">
               {layoutBlocks.map((block, index) => (
                 <SortableBlock key={index} id={index}>
-                {({ dragListeners }) => (
-                  <div
-                    className={`p-3 border rounded relative shadow-sm transition-transform duration-200 ease-in-out hover:shadow-md ${
-                      block.type === 'text'
-                        ? 'bg-white'
-                        : block.type === 'heading'
-                        ? 'bg-blue-50'
-                        : block.type === 'quote'
-                        ? 'bg-yellow-50'
-                        : block.type === 'code'
-                        ? 'bg-gray-100'
-                        : block.type === 'image'
-                        ? 'bg-green-50'
-                        : 'bg-purple-50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2 text-sm font-semibold text-gray-600">
-                      <span className="flex items-center gap-2">
-                        {block.type === 'text' && '📝 TEXT'}
-                        {block.type === 'heading' && '🔠 HEADING'}
-                        {block.type === 'quote' && '💬 QUOTE'}
-                        {block.type === 'code' && '⌨️ CODE'}
-                        {block.type === 'image' && '🖼️ IMAGE'}
-                        {block.type === 'video' && '🎥 VIDEO'}
-                      </span>
-                      <span {...dragListeners} className="cursor-grab text-gray-400">
-                        ↕
-                      </span>
-                    </div>
-              
-                    {['text', 'heading', 'quote', 'code'].includes(block.type) &&
-                      'content' in block && (
-                        <textarea
-                          placeholder={`Write ${block.type} here...`}
-                          value={block.content}
-                          onChange={(e) => updateTextBlock(index, e.target.value)}
-                          className="w-full border p-2 rounded text-sm font-mono"
-                        />
-                      )}
-              
-                    {block.type === 'image' && 'url' in block && (
-                      <img src={block.url} alt="layout-img" className="w-full rounded" />
-                    )}
-              
-                    {block.type === 'video' && 'url' in block && (
-                      <video src={block.url} controls className="w-full rounded" />
-                    )}
-              
-                    <button
-                      type="button"
-                      onClick={() => removeLayoutBlock(index)}
-                      className="absolute top-2 right-2 text-xl font-bold text-red-500 hover:text-red-700"
+                  {({ dragListeners }) => (
+                    <div
+                      className={`p-3 border rounded relative shadow-sm transition-transform duration-200 ease-in-out hover:shadow-md ${
+                        block.type === 'text'
+                          ? 'bg-white'
+                          : block.type === 'heading'
+                          ? 'bg-blue-50'
+                          : block.type === 'quote'
+                          ? 'bg-yellow-50'
+                          : block.type === 'code'
+                          ? 'bg-gray-100'
+                          : block.type === 'image'
+                          ? 'bg-green-50'
+                          : 'bg-purple-50'
+                      }`}
                     >
-                      ×
-                    </button>
-                  </div>
-                )}
-              </SortableBlock>
-              
+                      <div className="flex items-center justify-between mb-2 text-sm font-semibold text-gray-600">
+                        <span className="flex items-center gap-2">
+                          {block.type === 'text' && '📝 TEXT'}
+                          {block.type === 'heading' && '🔠 HEADING'}
+                          {block.type === 'quote' && '💬 QUOTE'}
+                          {block.type === 'code' && '⌨️ CODE'}
+                          {block.type === 'image' && '🖼️ IMAGE'}
+                          {block.type === 'video' && '🎥 VIDEO'}
+                        </span>
+                        <span {...dragListeners} className="cursor-grab text-gray-400">
+                          ↕
+                        </span>
+                      </div>
+
+                      {['text', 'heading', 'quote', 'code'].includes(block.type) &&
+                        'content' in block && (
+                          <textarea
+                            placeholder={`Write ${block.type} here...`}
+                            value={block.content}
+                            onChange={(e) => updateTextBlock(index, e.target.value)}
+                            className="w-full border p-2 rounded text-sm font-mono"
+                          />
+                        )}
+
+                      {block.type === 'image' && 'url' in block && (
+                        <img src={block.url} alt="layout-img" className="w-full rounded" />
+                      )}
+
+                      {block.type === 'video' && 'url' in block && (
+                        <video src={block.url} controls className="w-full rounded" />
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => removeLayoutBlock(index)}
+                        className="absolute top-2 right-2 text-xl font-bold text-red-500 hover:text-red-700"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                </SortableBlock>
               ))}
             </div>
           </SortableContext>
         </DndContext>
       </div>
 
-      <div className="flex justify-end gap-3">
+      {/* 保存操作 */}
+      <div className="flex justify-end gap-3 pt-4">
+        <button
+          onClick={() => setEditingProject(null)}
+          data-modal-close
+          className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100"
+        >
+          Cancel
+        </button>
         <button
           onClick={() => saveProject('draft')}
           className="px-4 py-2 bg-gray-600 text-white rounded"
@@ -377,6 +501,7 @@ export default function ProjectManager() {
     </div>
   )}
 </Modal>
+
 
     </div>
   );

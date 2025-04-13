@@ -29,14 +29,23 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      <body>
+      <body className="min-h-screen flex flex-col">
         <Navbar />
-        {children}
-        <Toaster position="top-center" toastOptions={{
+
+        
+        <main className="flex-1">
+          {children}
+        </main>
+
+        <Toaster
+          position="top-center"
+          toastOptions={{
             style: {
-              marginTop: '4rem', // or adjust to fit under your navbar
+              marginTop: '4rem',
             },
-          }}/>
+          }}
+        />
+
         <Footer />
       </body>
     </html>
