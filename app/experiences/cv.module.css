@@ -277,7 +277,7 @@
     align-items: center;
     gap: 1rem;
     position: relative;
-    left: calc(3.5% + 3.5px);
+    left: calc(1.8% + 1px);/* 控制时间文字 + dot 相对于progress line向左偏移 */
   }
   
   .timelineDate {

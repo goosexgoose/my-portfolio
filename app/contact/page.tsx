@@ -60,7 +60,7 @@ export default function ContactPage() {
           <div>
             <h2 className="text-xl font-semibold mb-3">Working Hours</h2>
             <p className="text-gray-700">09:00am – 07:00pm (London Time)</p>
-            <p className="text-sm text-gray-500 mb-6">Please note: I’m based in London, UK 🇬🇧</p>
+            <p className="text-sm text-gray-500 mb-6">Monday to Friday </p>
 
             <h2 className="text-xl font-semibold mb-3">My Official Email</h2>
             <p className="text-gray-700 mb-2">Liyuquanr@gmail.com</p>

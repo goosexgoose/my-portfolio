@@ -5,12 +5,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebaseClient';
+import { ADMIN_UID } from '@/lib/firebaseShared'; 
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [avatarUrl, setAvatarUrl] = useState('/pics/user.png'); // default avatar
+  const [avatarUrl, setAvatarUrl] = useState('/pics/user.png');
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  // Mobile navbar toggle
   useEffect(() => {
     const toggleNavbar = () => {
       const nav = document.getElementById('myTopnav');
@@ -26,7 +27,6 @@ export default function Navbar() {
     return () => icon?.removeEventListener('click', toggleNavbar);
   }, []);
 
-  // Auth avatar listener
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -36,6 +36,13 @@ export default function Navbar() {
           );
           const fallback = isGoogleUser ? user.photoURL ?? '/pics/user.png' : '/pics/user.png';
           setAvatarUrl(user.photoURL ?? fallback);
+
+          // Check admin
+          if (user.uid === ADMIN_UID) {
+            setIsAdmin(true);
+          }
+        } else {
+          setIsAdmin(false);
         }
       });
       return () => unsubscribe();
@@ -44,36 +51,41 @@ export default function Navbar() {
 
   return (
     <div className="topnav" id="myTopnav">
-  <div className="nav-left">
-    <Link href="/" className={pathname === '/' ? 'active' : ''}>Home</Link>
-    <Link href="/experiences" className={pathname === '/experiences' ? 'active' : ''}>CV</Link>
-    <Link href="/projects" className={pathname === '/projects' ? 'active' : ''}>Projects</Link>
-    <Link href="/gallery" className={pathname === '/gallery' ? 'active' : ''}>Gallery</Link>
-    <Link href="/contact" className={pathname === '/contact' ? 'active' : ''}>Contact</Link>
-    <Link href="/dashboard" className={pathname === '/dashboard' ? 'active' : ''}>
-      <img
-        src={avatarUrl}
-        alt="User Profile"
-        className="navbar-avatar"
-        onError={(e) => {
-          (e.target as HTMLImageElement).src = '/pics/user.png';
-        }}
-      />
-    </Link>
-  </div>
+      <div className="nav-left">
+        <Link href="/" className={pathname === '/' ? 'active' : ''}>Home</Link>
+        <Link href="/experiences" className={pathname === '/experiences' ? 'active' : ''}>CV</Link>
+        <Link href="/projects" className={pathname === '/projects' ? 'active' : ''}>Projects</Link>
+        <Link href="/gallery" className={pathname === '/gallery' ? 'active' : ''}>Gallery</Link>
+        <Link href="/contact" className={pathname === '/contact' ? 'active' : ''}>Contact</Link>
+        
+        {/* ✅ Admin Link if Authenticated */}
+        {isAdmin && (
+          <Link href="/admin" className={pathname === '/admin' ? 'active' : ''}>Admin</Link>
+        )}
 
-  <div className="Logo">
-    <img src="/pics/autographs.png" alt="Logo" />
-  </div>
+        <Link href="/dashboard" className={pathname === '/dashboard' ? 'active' : ''}>
+          <img
+            src={avatarUrl}
+            alt="User Profile"
+            className="navbar-avatar"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/pics/user.png';
+            }}
+          />
+        </Link>
+      </div>
 
-  <a className="icon">
-    <div className="container" id="burger-icon">
-      <div className="bar1"></div>
-      <div className="bar2"></div>
-      <div className="bar3"></div>
+      <div className="Logo">
+        <img src="/pics/autographs.png" alt="Logo" />
+      </div>
+
+      <a className="icon">
+        <div className="container" id="burger-icon">
+          <div className="bar1"></div>
+          <div className="bar2"></div>
+          <div className="bar3"></div>
+        </div>
+      </a>
     </div>
-  </a>
-</div>
-
   );
 }
