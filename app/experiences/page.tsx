@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import styles from './cv.module.css';
 import Timeline from './Timeline';
+import SkillForceLayout from '@/components/SkillForceLayout';
 
 
 
@@ -71,13 +72,11 @@ export default function CVPage() {
 
       {/* --- Skills --- */}
       <section className={styles.section}>
-        <h2>Skills</h2>
-        <div className={styles.skills}>
-          {['Software Product Management', 'Web Development', 'Problem Solving', 'Teamwork', 'Presentation'].map((skill, i) => (
-            <div key={i} className={styles.skillBubble}>{skill}</div>
-          ))}
-        </div>
-      </section>
+  <h2>Skills</h2>
+  <SkillForceLayout />
+</section>
+
+
 
       
       {/* --- Hobbies --- */}

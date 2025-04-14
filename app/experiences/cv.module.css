@@ -102,34 +102,7 @@
     margin: 0 auto;
   }
   
-  /* === Skills === */
-  .skills {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-  }
-  
-  .skillBubble {
-    background-color: black;
-    color: white;
-    padding: 1rem;
-    border-radius: 50%;
-    width: 140px;
-    height: 140px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 0.9rem;
-    text-align: center;
-    animation: pulsate1 5s ease-in-out infinite;
-  }
-  
-  /* === Pulsate Animations === */
-  @keyframes pulsate1 {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-  }
+
   
   /* === Education === */
   .education {

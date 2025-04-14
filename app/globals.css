@@ -354,3 +354,15 @@ h2 {
   color: #444;
   margin-top: 0.2rem;
 }
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 4s ease-in-out infinite;
+}
