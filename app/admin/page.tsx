@@ -47,7 +47,8 @@ function SortableBlock({
 
 type Block =
   | { type: 'text' | 'heading' | 'quote' | 'code'; content: string }
-  | { type: 'image' | 'video'; url: string };
+  | { type: 'image' | 'video' | 'pdf'; url: string };
+
 
 interface Project {
   id?: string;
@@ -178,32 +179,33 @@ export default function ProjectManager() {
 
   function handleAddLayoutBlock(type: Block['type']) {
     if (['text', 'heading', 'quote', 'code'].includes(type)) {
-      setLayoutBlocks(prev => [
-        ...prev,
-        type === 'text' || type === 'heading' || type === 'quote' || type === 'code'
-          ? { type, content: '' }
-          : { type, url: '' },
-      ]);
+      setLayoutBlocks((prev) => [...prev, { type, content: '' } as Block]);
     } else {
       const input = document.createElement('input');
+      if (type === 'pdf') {
+        input.accept = 'application/pdf';
+      } else {
+        input.accept = type === 'image' ? 'image/*' : 'video/*';
+      }
       input.type = 'file';
-      input.accept = type === 'image' ? 'image/*' : 'video/*';
+  
       input.onchange = async (e: any) => {
         const file = e.target.files?.[0];
         if (!file) return;
+  
         try {
           const url = await uploadToCloudinary(file, 'portfolio/layouts');
-          setLayoutBlocks(prev => [
-            ...prev,
-            type === 'image' || type === 'video' ? { type, url } : null,
-          ].filter(Boolean) as Block[]);
+          setLayoutBlocks((prev) => [...prev, { type, url } as Block]);
         } catch (err) {
           toast.error('Upload failed');
         }
       };
+  
       input.click();
     }
   }
+  
+  
   
   function handleDragEnd(event: DragEndEvent): void {
     const { active, over } = event;
@@ -457,15 +459,16 @@ export default function ProjectManager() {
       <div className="space-y-2">
         <h4 className="text-md font-medium">📐 Project Layout</h4>
         <div className="flex gap-2 flex-wrap">
-          {['text', 'heading', 'quote', 'code', 'image', 'video'].map((type) => (
+        {['text', 'heading', 'quote', 'code', 'image', 'video', 'pdf'].map((type) => (
             <button
               key={type}
               onClick={() => handleAddLayoutBlock(type as Block['type'])}
               className="px-2 py-1 text-sm bg-gray-200 rounded"
             >
-              + {type.charAt(0).toUpperCase() + type.slice(1)}
+              + {type.toUpperCase()}
             </button>
           ))}
+
         </div>
 
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -497,6 +500,7 @@ export default function ProjectManager() {
                           {block.type === 'code' && '⌨️ CODE'}
                           {block.type === 'image' && '🖼️ IMAGE'}
                           {block.type === 'video' && '🎥 VIDEO'}
+                          {block.type === 'pdf' && '📄 PDF'}
                         </span>
                         <span {...dragListeners} className="cursor-grab text-gray-400">
                           ↕
@@ -520,6 +524,16 @@ export default function ProjectManager() {
                       {block.type === 'video' && 'url' in block && (
                         <video src={block.url} controls className="w-full rounded" />
                       )}
+                      {block.type === 'pdf' && 'url' in block && (
+                          <a
+                            href={block.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-blue-600 underline"
+                          >
+                            Open PDF
+                          </a>
+                        )}
 
                       <button
                         type="button"

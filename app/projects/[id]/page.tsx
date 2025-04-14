@@ -72,29 +72,44 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
 
         {/* 📐 Custom Layout Content */}
         <div className="space-y-6">
-          {layout?.map((block: any, index: number) => {
-            switch (block.type) {
-              case 'heading':
-                return <h2 key={index} className="text-2xl font-semibold">{block.content}</h2>;
-              case 'text':
-                return <p key={index} className="text-base whitespace-pre-wrap leading-relaxed">{block.content}</p>;
-              case 'quote':
-                return <blockquote key={index} className="border-l-4 border-yellow-400 pl-4 italic text-gray-700">{block.content}</blockquote>;
-              case 'code':
-                return (
-                  <pre key={index} className="bg-gray-100 text-sm p-4 rounded overflow-auto">
-                    <code>{block.content}</code>
-                  </pre>
-                );
-              case 'image':
-                return <img key={index} src={block.url} alt="project-img" className="w-full rounded" />;
-              case 'video':
-                return <video key={index} src={block.url} controls className="w-full rounded" />;
-              default:
-                return null;
-            }
-          })}
-        </div>
+            {layout?.map((block: any, index: number) => {
+              switch (block.type) {
+                case 'heading':
+                  return <h2 key={index} className="text-2xl font-semibold">{block.content}</h2>;
+                case 'text':
+                  return <p key={index} className="text-base whitespace-pre-wrap leading-relaxed">{block.content}</p>;
+                case 'quote':
+                  return <blockquote key={index} className="border-l-4 border-yellow-400 pl-4 italic text-gray-700">{block.content}</blockquote>;
+                case 'code':
+                  return (
+                    <pre key={index} className="bg-gray-100 text-sm p-4 rounded overflow-auto">
+                      <code>{block.content}</code>
+                    </pre>
+                  );
+                case 'image':
+                  return <img key={index} src={block.url} alt="project-img" className="w-full rounded" />;
+                case 'video':
+                  return <video key={index} src={block.url} controls className="w-full rounded" />;
+                case 'pdf':
+                  return (
+                    <div key={index} className="bg-pink-50 border border-pink-200 p-4 rounded shadow">
+                      <p className="text-sm text-pink-700 mb-2 font-medium">📄 Attached PDF:</p>
+                      <a
+                        href={block.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline text-sm"
+                      >
+                        Open PDF in new tab
+                      </a>
+                    </div>
+                  );
+                default:
+                  return null;
+              }
+            })}
+          </div>
+
 
         {/* 🕒 Timestamps */}
         {(project.createdAt || project.updatedAt) && (
