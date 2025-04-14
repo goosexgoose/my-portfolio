@@ -1,4 +1,4 @@
-import ReadingProgressBar from '@/components/ReadingProgressBar';
+
 import { notFound } from 'next/navigation';
 import { adminDb } from '@/lib/firebaseAdmin';
 import type { Metadata } from 'next';
@@ -46,8 +46,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
 
   return (
     <>
-      {/* 📊 Scroll Progress */}
-      <ReadingProgressBar />
+     
 
       <div className="max-w-3xl mx-auto px-4 py-12 space-y-10">
         {/* 🔙 Navigation */}
