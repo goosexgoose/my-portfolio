@@ -4,6 +4,8 @@ import Link from 'next/link';
 import styles from './cv.module.css';
 import Timeline from './Timeline';
 import SkillForceLayout from '@/components/SkillForceLayout';
+import SelectedProjects from '@/components/SelectedProjects';
+import ResumeDownloadButton from '@/components/ResumeDownloadButton';
 
 
 
@@ -11,7 +13,7 @@ export default function CVPage() {
   return (
     <div className={styles.cvContainer}>
       <header className={styles.header}>
-        <h1>Kaiya's CV</h1>
+        <h1></h1>
       </header>
 
       {/* --- Summary Section --- */}
@@ -26,7 +28,10 @@ export default function CVPage() {
             <Image src="/pics/touxiang1.JPG" alt="Kaiya" width={300} height={300} className={styles.avatar} />
           </div>
         </div>
+        
+
       </section>
+
 
       {/* --- Education --- */}
       <section className={styles.section}>
@@ -44,6 +49,9 @@ export default function CVPage() {
           </div>
         </div>
       </section>
+
+      
+
 
     {/*
       --- Work Experience --- 
@@ -72,32 +80,31 @@ export default function CVPage() {
 
       {/* --- Skills --- */}
       <section className={styles.section}>
-  <h2>Skills</h2>
-  <SkillForceLayout />
-</section>
+        <h2>Skills</h2>
+        <SkillForceLayout />
+      </section>
 
 
 
       
-      {/* --- Hobbies --- */}
+      {/* --- Selected Projects --- */}
       <section className={styles.section}>
-        <h2>Other Passions</h2>
-        <div className={styles.carousel}>
-          <Image src="/pics/R0014467.jpg" alt="Photography" width={600} height={400} />
-          <p>I like to capture humanity through the way I capture light and shadow.</p>
-          <Image src="/pics/game1.jpg" alt="Gaming" width={600} height={400} />
-          <p>I sometimes livestream games like Splatoon3.</p>
-        </div>
+        <h2>Selected Projects</h2>
+        <SelectedProjects />
       </section>
+
 
       {/* --- Buttons --- */}
       <div className={styles.buttonGroup}>
-        <Link href="/blog" className="btn">See More Artworks</Link>
+        <Link href="/projects" className="btn">See More Projects</Link>
+        <ResumeDownloadButton />
         <Link href="/more" className="btn">Contact Me</Link>
       </div>
     </div>
   );
 }
+
+
 
 // Work Experience Data
 const workExperiences = [

@@ -5,6 +5,9 @@ import Footer from '@/components/Footer';
 import Head from 'next/head'; 
 import React from 'react';
 import { Toaster } from 'react-hot-toast';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 export const metadata = {
   title: "Kaiya's Portfolio",

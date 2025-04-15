@@ -17,6 +17,9 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Modal from '@/components/Modal';
+import AdminCVUploader from '@/components/AdminCVUploader';
+
+
 
 function SortableBlock({
   id,
@@ -245,6 +248,9 @@ export default function ProjectManager() {
         >
           + Add Project
         </button>
+        
+        <AdminCVUploader />
+
         <div className="flex items-center gap-3">
           <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="border rounded px-2 py-1 text-sm">
             <option value="All">All Categories</option>

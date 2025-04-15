@@ -1,5 +1,3 @@
-// lib/uploadToCloudinary.ts
-
 export const uploadToCloudinary = async (
   file: File,
   folder = 'portfolio'
@@ -12,15 +10,11 @@ export const uploadToCloudinary = async (
   formData.append('upload_preset', uploadPreset);
   formData.append('folder', folder);
 
- 
   const resourceType = file.type === 'application/pdf'
     ? 'raw'
     : file.type.startsWith('video/')
     ? 'video'
     : 'image';
-
-  
-  formData.append('resource_type', resourceType);
 
   try {
     const res = await fetch(
