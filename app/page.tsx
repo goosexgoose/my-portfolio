@@ -23,7 +23,7 @@ export default function Home() {
         </div>
 
         <div className="intro-image">
-          <img src="/pics/R0015207.JPG" alt="Kaiya" />
+          <img src="/pics/IMG_8124.JPG" alt="Kaiya" />
         </div>
       </section>
 

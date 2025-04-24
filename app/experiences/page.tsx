@@ -21,8 +21,9 @@ export default function CVPage() {
         <h2>Professional Summary</h2>
         <div className={styles.row}>
           <div className={styles.colText}>
-            <p>I am Kaiya Li, a dynamic tech and media professional with a unique blend of computing expertise and a flair for digital storytelling...</p>
-            <p>My full-time roles at ByteDance Douyin Encyclopaedia, Sina Weibo and SOHU TV have honed my expertise in creating user-centric digital products...</p>
+            <p>I'm a software developer with a background in product strategy and a growing focus on building full-stack applications that solve real-world problems. Currently completing my MSc in Computing at Cardiff University, I’ve developed projects like MealCraft, an iOS app that uses Core ML and Firebase to provide personalized recipe recommendations and real-time inventory tracking. My technical skill set includes Swift, Python, JavaScript, SQL, and Firebase, with hands-on experience in user authentication, cloud integration, and machine learning model deployment.</p>
+
+            <p className="mt-4">Before transitioning into tech, I worked at ByteDance and Sina Weibo, where I led cross-functional projects to improve product performance and user engagement. I also bring experience in game localization and translation, having adapted major titles between Chinese and English with attention to nuance and player experience. My strength lies in bridging code, creativity, and product thinking to build scalable, user-centered solutions.</p>
           </div>
           <div className={styles.colImage}>
             <Image src="/pics/touxiang1.JPG" alt="Kaiya" width={300} height={300} className={styles.avatar} />

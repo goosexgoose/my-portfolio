@@ -65,7 +65,7 @@ const workExperiences = [
   {
     company: 'Freelance Translator & Developer',
     gradient: 'linear-gradient(135deg, #ff8a00, #e52e71)',
-    logo: '/pics/today-icon.png',
+    logo: '/pics/autographs.png',
     title: 'Current Projects: Freelance & Portfolio Development',
     responsibilities: [
       'Building personal portfolio with Next.js.',
