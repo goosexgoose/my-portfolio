@@ -1,6 +1,24 @@
 'use client';
 
-export default function FilterControls({ searchTerm, setSearchTerm, filterCategory, setFilterCategory, sortBy, setSortBy }: any) {
+interface FilterControlsProps {
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
+  filterCategory: string;
+  setFilterCategory: (value: string) => void;
+  sortBy: string;
+  setSortBy: (value: string) => void;
+}
+
+const categories = ['All', 'Coding', 'Localization', 'Photography'];
+
+export default function FilterControls({
+  searchTerm,
+  setSearchTerm,
+  filterCategory,
+  setFilterCategory,
+  sortBy,
+  setSortBy,
+}: FilterControlsProps) {
   return (
     <div className="flex flex-wrap gap-4 items-center">
       <input
@@ -16,10 +34,11 @@ export default function FilterControls({ searchTerm, setSearchTerm, filterCatego
         onChange={(e) => setFilterCategory(e.target.value)}
         className="border px-3 py-2 rounded"
       >
-        <option value="All">All Categories</option>
-        <option value="Coding">Coding</option>
-        <option value="Localization">Localization</option>
-        <option value="Photography">Photography</option>
+        {categories.map((cat) => (
+          <option key={cat} value={cat}>
+            {cat}
+          </option>
+        ))}
       </select>
 
       <select

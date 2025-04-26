@@ -3,12 +3,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { db } from '@/lib/firebaseClient';
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import Link from 'next/link';
 
 import ProjectSidebar from '@/components/projects/ProjectSidebar';
 import SidebarToggleButton from '@/components/common/SidebarToggleButton';
 import FilterControls from '@/components/projects/FilterControls';
 import ProjectCard from '@/components/projects/ProjectCard';
+import PhotographyMasonry from '@/components/gallery/PhotographyMasonry';
 
 interface Project {
   id: string;
@@ -32,6 +32,7 @@ export default function ProjectsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Fetch all published projects
   useEffect(() => {
     (async () => {
       const baseQuery = query(collection(db, 'projects'), where('status', '==', 'published'));
@@ -45,7 +46,7 @@ export default function ProjectsPage() {
     })();
   }, []);
 
-  // Filter and sort projects based on category, search term, and sort order
+  // Filter + Search + Sort logic
   const filtered = useMemo(() => {
     let result = [...projects];
 
@@ -78,7 +79,7 @@ export default function ProjectsPage() {
     return result;
   }, [projects, filterCategory, searchTerm, sortBy]);
 
-  // Group projects into categories
+  // Group by category
   const grouped = useMemo(() => {
     const res: Record<string, Project[]> = {
       Coding: [],
@@ -100,16 +101,14 @@ export default function ProjectsPage() {
       {/* Sidebar */}
       <ProjectSidebar categories={categories} sidebarOpen={sidebarOpen} />
 
-      {/* Mobile Sidebar Toggle Button */}
+      {/* Mobile Sidebar Button */}
       <SidebarToggleButton sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       {/* Main Content */}
       <main className="flex-1 space-y-10">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">My Projects</h1>
-          <p className="text-gray-600">
-            Browse all published projects by category with filter, sort, and search.
-          </p>
+          <p className="text-gray-600">Browse all published projects by category with filter, sort, and search.</p>
         </div>
 
         <FilterControls
@@ -121,42 +120,27 @@ export default function ProjectsPage() {
           setSortBy={setSortBy}
         />
 
+        {/* Grouped projects by category */}
         {categories.map((cat) => {
-          let list = grouped[cat];
+          const list = grouped[cat];
           if (!list.length) return null;
 
-          // Limit photography projects to 3 items
-          if (cat === 'Photography') {
-            list = list.slice(0, 3);
-          }
-
-          return (
+          return cat === 'Photography' ? (
             <section key={cat} id={cat.toLowerCase()} className="space-y-6">
               <h2 className="text-xl font-semibold">{cat} Projects</h2>
-
+              {/* Insert Masonry layout */}
+              <div className="border rounded-lg p-4 bg-white">
+                <PhotographyMasonry />
+              </div>
+            </section>
+          ) : (
+            <section key={cat} id={cat.toLowerCase()} className="space-y-6">
+              <h2 className="text-xl font-semibold">{cat} Projects</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {list.map((proj) => (
                   <ProjectCard key={proj.id} project={proj} />
                 ))}
               </div>
-
-              {/* Show a link to Gallery page if category is Photography */}
-              {cat === 'Photography' && (
-  <div className="text-center pt-8">
-    <div className="inline-block bg-blue-50 px-6 py-4 rounded-xl">
-      <p className="text-gray-700 text-base mb-2">
-        For a full photography collection and enhanced viewing experience,
-      </p>
-      <Link
-        href="/gallery"
-        className="inline-block text-blue-600 font-semibold hover:underline hover:text-blue-700 transition"
-      >
-        Visit the Gallery →
-      </Link>
-    </div>
-  </div>
-)}
-
             </section>
           );
         })}
