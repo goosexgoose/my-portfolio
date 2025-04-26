@@ -24,13 +24,13 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 space-y-10">
-      {/* 🔙 Navigation */}
+      {/* Navigation */}
       <div className="flex justify-between items-center text-sm text-gray-500 pb-4">
         <Link href="/" className="hover:underline">← Home</Link>
         <Link href="/projects" className="hover:underline">All Projects →</Link>
       </div>
 
-      {/* 🖼️ Cover Image */}
+      {/* Cover Image */}
       {project.coverUrl && (
         <img
           src={project.coverUrl}
@@ -39,20 +39,20 @@ export default async function ProjectDetailPage({ params }: Props) {
         />
       )}
 
-      {/* 📌 Title + Description */}
+      {/* Title + Description */}
       <div>
         <h1 className="text-3xl font-bold">{project.title}</h1>
         <p className="text-gray-600 mt-2">{project.description}</p>
       </div>
 
-      {/* ✨ Rich Content Viewer */}
+      {/*  Rich Content Viewer */}
       {layout && (
         <div className="prose max-w-none">
           <RichContentViewer content={layout} />
         </div>
       )}
 
-      {/* 🕒 Timestamps */}
+      {/* Timestamps */}
       {(project.createdAt || project.updatedAt) && (
         <div className="pt-8 text-xs text-gray-500 border-t space-y-1">
           {project.createdAt?.toDate && (

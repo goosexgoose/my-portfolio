@@ -7,7 +7,6 @@ import {
   getDocs,
   query,
   where,
-  orderBy,
 } from 'firebase/firestore';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -20,6 +19,7 @@ interface Project {
   tech: string[];
   category: 'Coding' | 'Localization' | 'Photography';
   coverUrl?: string;
+  layout?: any;
   status: 'draft' | 'published';
   createdAt?: { toDate: () => Date };
 }
@@ -65,12 +65,7 @@ export default function ProjectsPage() {
 
     switch (sortBy) {
       case 'createdAsc':
-        result.sort((a, b) => {
-          return (
-            new Date(a.createdAt?.toDate?.() ?? 0).getTime() -
-            new Date(b.createdAt?.toDate?.() ?? 0).getTime()
-          );
-        });
+        result.sort((a, b) => (new Date(a.createdAt?.toDate?.() ?? 0)).getTime() - (new Date(b.createdAt?.toDate?.() ?? 0)).getTime());
         break;
       case 'titleAsc':
         result.sort((a, b) => a.title.localeCompare(b.title));
@@ -79,12 +74,7 @@ export default function ProjectsPage() {
         result.sort((a, b) => b.title.localeCompare(a.title));
         break;
       default:
-        result.sort((a, b) => {
-          return (
-            new Date(b.createdAt?.toDate?.() ?? 0).getTime() -
-            new Date(a.createdAt?.toDate?.() ?? 0).getTime()
-          );
-        });
+        result.sort((a, b) => (new Date(b.createdAt?.toDate?.() ?? 0)).getTime() - (new Date(a.createdAt?.toDate?.() ?? 0)).getTime());
     }
 
     return result;
@@ -102,11 +92,49 @@ export default function ProjectsPage() {
     return res;
   }, [filtered]);
 
+  function formatUrl(url: string | undefined | null): string | null {
+    if (!url) return null;
+    if (url.startsWith('//')) return `https:${url}`;
+    return url;
+  }
+
+  function getFirstImageFromLayout(layout: any): string | null {
+    try {
+      if (!layout) return null;
+  
+      
+      const layoutObj = typeof layout === 'string' ? JSON.parse(layout) : layout;
+  
+      
+      const doc = layoutObj?.en || layoutObj?.zh;
+      if (!doc || doc.type !== 'doc' || !Array.isArray(doc.content)) return null;
+  
+    
+      const firstImageNode = doc.content.find(
+        (node: any) => node.type === 'image' && node.attrs?.src
+      );
+  
+      if (!firstImageNode) {
+        console.warn('No image node found in layout:', layoutObj);
+        return null;
+      }
+  
+      const src = firstImageNode.attrs.src;
+      if (!src) return null;
+  
+    
+      return src.startsWith('//') ? `https:${src}` : src;
+    } catch (error) {
+      console.error('Error parsing layout or extracting image:', error);
+      return null;
+    }
+  }
+  
+
   return (
     <div className="relative flex flex-col sm:flex-row max-w-7xl mx-auto px-4 pt-10 pb-20 gap-6">
       {/* Sidebar */}
       <aside className="hidden sm:flex flex-col gap-4 text-sm text-gray-700 font-medium pt-2 mt-55 sticky top-30 w-40">
-
         <div className="sticky top-20 text-sm space-y-4">
           {categories.map((cat) => (
             <a
@@ -185,46 +213,53 @@ export default function ProjectsPage() {
             <section key={cat} id={cat.toLowerCase()} className="space-y-6">
               <h2 className="text-xl font-semibold">{cat} Projects</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {list.map((p) => (
-                  <div
-                    key={p.id}
-                    className="border rounded-lg shadow bg-white hover:shadow-lg transition-all p-4 group"
-                  >
-                    {p.coverUrl && (
-                      <div className="mb-3 overflow-hidden rounded">
-                        <Image
-                          src={p.coverUrl}
-                          alt={p.title}
-                          width={600}
-                          height={400}
-                          className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                      </div>
-                    )}
-                    <h3 className="text-lg font-semibold line-clamp-1">
-                      {p.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-2">
-                      {p.description}
-                    </p>
-                    <div className="flex flex-wrap gap-1 text-xs mb-3">
-                      {p.tech.map((tag, i) => (
-                        <span
-                          key={i}
-                          className="bg-gray-100 border px-2 py-0.5 rounded"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <Link
-                      href={`/projects/${p.id}`}
-                      className="text-blue-600 text-sm hover:underline"
+                {list.map((p) => {
+                  const firstImage = getFirstImageFromLayout(p.layout);
+                  const cover = firstImage || (p.coverUrl ? formatUrl(p.coverUrl) : null);
+
+                  console.log('Project:', p.title, 'Cover:', cover);
+
+                  return (
+                    <div
+                      key={p.id}
+                      className="border rounded-lg shadow bg-white hover:shadow-lg transition-all p-4 group"
                     >
-                      View Details →
-                    </Link>
-                  </div>
-                ))}
+                      {cover && (
+                        <div className="mb-3 overflow-hidden rounded">
+                          <Image
+                            src={cover}
+                            alt={p.title}
+                            width={600}
+                            height={400}
+                            className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        </div>
+                      )}
+                      <h3 className="text-lg font-semibold line-clamp-1">
+                        {p.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+                        {p.description}
+                      </p>
+                      <div className="flex flex-wrap gap-1 text-xs mb-3">
+                        {p.tech.map((tag, i) => (
+                          <span
+                            key={i}
+                            className="bg-gray-100 border px-2 py-0.5 rounded"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      <Link
+                        href={`/projects/${p.id}`}
+                        className="text-blue-600 text-sm hover:underline"
+                      >
+                        View Details →
+                      </Link>
+                    </div>
+                  );
+                })}
               </div>
             </section>
           );
