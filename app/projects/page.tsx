@@ -2,15 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { db } from '@/lib/firebaseClient';
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore';
-import Image from 'next/image';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import Link from 'next/link';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
+
+import ProjectSidebar from '@/components/projects/ProjectSidebar';
+import SidebarToggleButton from '@/components/common/SidebarToggleButton';
+import FilterControls from '@/components/projects/FilterControls';
+import ProjectCard from '@/components/projects/ProjectCard';
 
 interface Project {
   id: string;
@@ -32,22 +30,22 @@ export default function ProjectsPage() {
   const [filterCategory, setFilterCategory] = useState('All');
   const [sortBy, setSortBy] = useState('createdDesc');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const baseQuery = query(
-        collection(db, 'projects'),
-        where('status', '==', 'published')
-      );
+      const baseQuery = query(collection(db, 'projects'), where('status', '==', 'published'));
       const snapshot = await getDocs(baseQuery);
       const all = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as Project[];
       setProjects(all);
+      setLoading(false);
     })();
   }, []);
 
+  // Filter and sort projects based on category, search term, and sort order
   const filtered = useMemo(() => {
     let result = [...projects];
 
@@ -80,6 +78,7 @@ export default function ProjectsPage() {
     return result;
   }, [projects, filterCategory, searchTerm, sortBy]);
 
+  // Group projects into categories
   const grouped = useMemo(() => {
     const res: Record<string, Project[]> = {
       Coding: [],
@@ -92,73 +91,17 @@ export default function ProjectsPage() {
     return res;
   }, [filtered]);
 
-  function formatUrl(url: string | undefined | null): string | null {
-    if (!url) return null;
-    if (url.startsWith('//')) return `https:${url}`;
-    return url;
+  if (loading) {
+    return <div className="p-10 text-center text-gray-500">Loading projects...</div>;
   }
-
-  function getFirstImageFromLayout(layout: any): string | null {
-    try {
-      if (!layout) return null;
-  
-      
-      const layoutObj = typeof layout === 'string' ? JSON.parse(layout) : layout;
-  
-      
-      const doc = layoutObj?.en || layoutObj?.zh;
-      if (!doc || doc.type !== 'doc' || !Array.isArray(doc.content)) return null;
-  
-    
-      const firstImageNode = doc.content.find(
-        (node: any) => node.type === 'image' && node.attrs?.src
-      );
-  
-      if (!firstImageNode) {
-        console.warn('No image node found in layout:', layoutObj);
-        return null;
-      }
-  
-      const src = firstImageNode.attrs.src;
-      if (!src) return null;
-  
-    
-      return src.startsWith('//') ? `https:${src}` : src;
-    } catch (error) {
-      console.error('Error parsing layout or extracting image:', error);
-      return null;
-    }
-  }
-  
 
   return (
     <div className="relative flex flex-col sm:flex-row max-w-7xl mx-auto px-4 pt-10 pb-20 gap-6">
       {/* Sidebar */}
-      <aside className="hidden sm:flex flex-col gap-4 text-sm text-gray-700 font-medium pt-2 mt-55 sticky top-30 w-40">
-        <div className="sticky top-20 text-sm space-y-4">
-          {categories.map((cat) => (
-            <a
-              key={cat}
-              href={`#${cat.toLowerCase()}`}
-              className="block text-gray-700 hover:text-black hover:underline transition"
-            >
-              {cat}
-            </a>
-          ))}
-        </div>
-      </aside>
+      <ProjectSidebar categories={categories} sidebarOpen={sidebarOpen} />
 
-      {/* Sidebar Toggle for Mobile */}
-      <button
-        onClick={() => setSidebarOpen((prev) => !prev)}
-        className="sm:hidden fixed bottom-4 left-4 z-50 bg-black text-white rounded-full p-2 shadow-lg"
-      >
-        {sidebarOpen ? (
-          <XMarkIcon className="h-6 w-6" />
-        ) : (
-          <Bars3Icon className="h-6 w-6" />
-        )}
-      </button>
+      {/* Mobile Sidebar Toggle Button */}
+      <SidebarToggleButton sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       {/* Main Content */}
       <main className="flex-1 space-y-10">
@@ -169,105 +112,54 @@ export default function ProjectsPage() {
           </p>
         </div>
 
-        {/* Filter Controls */}
-        <div className="flex flex-wrap gap-4 items-center">
-          <input
-            type="text"
-            placeholder="Search projects..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="border px-3 py-2 rounded w-full sm:w-auto"
-          />
+        <FilterControls
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filterCategory={filterCategory}
+          setFilterCategory={setFilterCategory}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+        />
 
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="border px-3 py-2 rounded"
-          >
-            <option value="All">All Categories</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="border px-3 py-2 rounded"
-          >
-            <option value="createdDesc">Created: Newest First</option>
-            <option value="createdAsc">Created: Oldest First</option>
-            <option value="titleAsc">Title: A–Z</option>
-            <option value="titleDesc">Title: Z–A</option>
-          </select>
-        </div>
-
-        {/* Grouped Projects */}
         {categories.map((cat) => {
-          const list = grouped[cat];
-          if (!list?.length) return null;
+          let list = grouped[cat];
+          if (!list.length) return null;
+
+          // Limit photography projects to 3 items
+          if (cat === 'Photography') {
+            list = list.slice(0, 3);
+          }
 
           return (
             <section key={cat} id={cat.toLowerCase()} className="space-y-6">
               <h2 className="text-xl font-semibold">{cat} Projects</h2>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {list.map((p) => {
-                  const firstImage = getFirstImageFromLayout(p.layout);
-                  const cover = firstImage || (p.coverUrl ? formatUrl(p.coverUrl) : null);
-
-                  console.log('Project:', p.title, 'Cover:', cover);
-
-                  return (
-                    <div
-                      key={p.id}
-                      className="border rounded-lg shadow bg-white hover:shadow-lg transition-all p-4 group"
-                    >
-                      {cover && (
-                        <div className="mb-3 overflow-hidden rounded">
-                          <Image
-                            src={cover}
-                            alt={p.title}
-                            width={600}
-                            height={400}
-                            className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
-                          />
-                        </div>
-                      )}
-                      <h3 className="text-lg font-semibold line-clamp-1">
-                        {p.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 line-clamp-2 mb-2">
-                        {p.description}
-                      </p>
-                      <div className="flex flex-wrap gap-1 text-xs mb-3">
-                        {p.tech.map((tag, i) => (
-                          <span
-                            key={i}
-                            className="bg-gray-100 border px-2 py-0.5 rounded"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <Link
-                        href={`/projects/${p.id}`}
-                        className="text-blue-600 text-sm hover:underline"
-                      >
-                        View Details →
-                      </Link>
-                    </div>
-                  );
-                })}
+                {list.map((proj) => (
+                  <ProjectCard key={proj.id} project={proj} />
+                ))}
               </div>
+
+              {/* Show a link to Gallery page if category is Photography */}
+              {cat === 'Photography' && (
+  <div className="text-center pt-8">
+    <div className="inline-block bg-blue-50 px-6 py-4 rounded-xl">
+      <p className="text-gray-700 text-base mb-2">
+        For a full photography collection and enhanced viewing experience,
+      </p>
+      <Link
+        href="/gallery"
+        className="inline-block text-blue-600 font-semibold hover:underline hover:text-blue-700 transition"
+      >
+        Visit the Gallery →
+      </Link>
+    </div>
+  </div>
+)}
+
             </section>
           );
         })}
-
-        {!filtered.length && (
-          <p className="text-gray-500 text-center py-20">No projects found.</p>
-        )}
       </main>
     </div>
   );

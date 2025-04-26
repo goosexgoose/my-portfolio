@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { adminDb } from '@/lib/firebaseAdmin';
-import RichContentViewer from '@/components/RichContentViewer';
+import RichContentViewer from '@/components/editor/RichContentViewer';
 import Link from 'next/link';
 
 interface Props {
@@ -16,11 +16,7 @@ export default async function ProjectDetailPage({ params }: Props) {
   }
 
   const project = snapshot.data()!;
-  const layoutObj = typeof project.layout === 'string'
-  ? JSON.parse(project.layout)
-  : project.layout;
-
-  const layout = layoutObj?.en || layoutObj?.zh || null;
+  const layout = project.layout?.en || project.layout?.zh || null; 
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 space-y-10">
@@ -35,7 +31,7 @@ export default async function ProjectDetailPage({ params }: Props) {
         <img
           src={project.coverUrl}
           alt="project cover"
-          className="w-full max-h-[400px] object-cover rounded-lg shadow"
+          className="w-full max-h-[400px] object-contain rounded-lg shadow"
         />
       )}
 
@@ -45,7 +41,7 @@ export default async function ProjectDetailPage({ params }: Props) {
         <p className="text-gray-600 mt-2">{project.description}</p>
       </div>
 
-      {/*  Rich Content Viewer */}
+      {/* Rich Content Viewer */}
       {layout && (
         <div className="prose max-w-none">
           <RichContentViewer content={layout} />

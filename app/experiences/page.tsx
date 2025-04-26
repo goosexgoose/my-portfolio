@@ -3,9 +3,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import styles from './cv.module.css';
 import Timeline from './Timeline';
-import SkillForceLayout from '@/components/SkillForceLayout';
-import SelectedProjects from '@/components/SelectedProjects';
-import ResumeDownloadButton from '@/components/ResumeDownloadButton';
+import SkillForceLayout from '@/components/common/SkillForceLayout';
+import SelectedProjects from '@/components/common/SelectedProjects';
+import ResumeDownloadButton from '@/components/common/ResumeDownloadButton';
 
 
 

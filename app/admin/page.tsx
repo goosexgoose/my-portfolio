@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Timestamp, collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 import { uploadToCloudinary } from '@/lib/uploadToCloudinary';
-import AdminCVUploader from '@/components/AdminCVUploader';
-import Modal from '@/components/Modal';
-import RichTextEditor from '@/components/RichTextEditor';
+import AdminCVUploader from '@/components/auth/AdminCVUploader';
+import Modal from '@/components/auth/Modal';
+import RichTextEditor from '@/components/editor/RichTextEditor';
 import { toast } from 'react-hot-toast';
 
 interface Project {
@@ -14,6 +14,8 @@ interface Project {
   title: string;
   description: string;
   tech: string[];
+  deviceTags?: string[]; //new tags for devices
+  isRecentWork?: boolean;
   category: 'Coding' | 'Localization' | 'Photography';
   github?: string;
   demo?: string;
@@ -29,6 +31,8 @@ interface Project {
     description?: string;
     keywords?: string;
   };
+  newSkill?: string; // Added newSkill property 
+  newDevice?: string;
 }
 
 export default function ProjectManager() {
@@ -85,7 +89,7 @@ export default function ProjectManager() {
 
     await setDoc(docRef, {
       ...payload,
-      layout: JSON.stringify(payload.layout),
+      layout: payload.layout,
     }, { merge: true });
 
     toast.success(editingProject.id ? 'Updated' : 'Created');
@@ -173,6 +177,143 @@ export default function ProjectManager() {
               <option value="Localization">Game Localization</option>
               <option value="Photography">Photography</option>
             </select>
+            {/* 技能标签输入 */}
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Add a skill..."
+                  value={(editingProject as any).newSkill || ''}
+                  onChange={(e) =>
+                    setEditingProject((prev) =>
+                      prev ? { ...prev, newSkill: e.target.value } : null
+                    )
+                  }
+                  className="border px-3 py-2 rounded flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (editingProject && editingProject.newSkill?.trim()) {
+                      const skill = editingProject.newSkill.trim();
+                      if (!editingProject.tech.includes(skill)) {
+                        setEditingProject((prev) =>
+                          prev ? {
+                            ...prev,
+                            tech: [...prev.tech, skill],
+                            newSkill: '',
+                          } : null
+                        );
+                      }
+                    }
+                  }}
+                  className="bg-black text-white px-4 py-2 rounded"
+                >
+                  Add
+                </button>
+              </div>
+
+              {/* 已添加技能标签 */}
+              <div className="flex flex-wrap gap-2">
+                {editingProject?.tech.map((skill, idx) => (
+                  <span
+                    key={idx}
+                    className="flex items-center gap-1 border rounded-full px-3 py-1 bg-gray-100 text-sm"
+                  >
+                    {skill}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setEditingProject((prev) =>
+                          prev ? {
+                            ...prev,
+                            tech: prev.tech.filter((s) => s !== skill),
+                          } : null
+                        )
+                      }
+                      className="text-gray-400 hover:text-red-500"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+            {/* device tags input */}
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Add a device..."
+                  value={(editingProject as any).newDevice || ''}
+                  onChange={(e) =>
+                    setEditingProject((prev) =>
+                      prev ? { ...prev, newDevice: e.target.value } : null
+                    )
+                  }
+                  className="border px-3 py-2 rounded flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (editingProject && editingProject.newDevice?.trim()) {
+                      const device = editingProject.newDevice.trim();
+                      if (!editingProject.deviceTags?.includes(device)) {
+                        setEditingProject((prev) =>
+                          prev ? {
+                            ...prev,
+                            deviceTags: [...(prev.deviceTags || []), device],
+                            newDevice: '',
+                          } : null
+                        );
+                      }
+                    }
+                  }}
+                  className="bg-black text-white px-4 py-2 rounded"
+                >
+                  Add
+                </button>
+              </div>
+
+              {/* added device tags */}
+              <div className="flex flex-wrap gap-2">
+                {editingProject?.deviceTags?.map((device, idx) => (
+                  <span
+                    key={idx}
+                    className="flex items-center gap-1 border rounded-full px-3 py-1 bg-gray-100 text-sm"
+                  >
+                    {device}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setEditingProject((prev) =>
+                          prev ? {
+                            ...prev,
+                            deviceTags: prev.deviceTags?.filter((d) => d !== device),
+                          } : null
+                        )
+                      }
+                      className="text-gray-400 hover:text-red-500"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+            {/* select as Recent Work */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={!!editingProject?.isRecentWork}
+                onChange={(e) =>
+                  setEditingProject((prev) =>
+                    prev ? { ...prev, isRecentWork: e.target.checked } : null
+                  )
+                }
+              />
+              <label className="text-sm">Mark as Recent Work</label>
+            </div>
 
             <div className="border rounded p-2">
               <div className="flex justify-between items-center mb-2">

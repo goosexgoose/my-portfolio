@@ -11,7 +11,7 @@ import {
   signOut,
 } from 'firebase/auth';
 import styles from './dashboard.module.css';
-import LoginRegisterForm from '@/components/LoginRegisterForm';
+import LoginRegisterForm from '@/components/auth/LoginRegisterForm';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
