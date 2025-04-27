@@ -52,7 +52,7 @@ export default function ContactPage() {
 
   return (
     <div className="bg-gray-100 py-20 px-4">
-      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-8 md:p-16">
+      <div className="max-w-6xl mx-auto bg-white rounded-none shadow-md p-8 md:p-16">
         <h1 className="text-3xl md:text-4xl font-bold text-center mb-12">Contact and Subscribe</h1>
 
         <div className="grid md:grid-cols-2 gap-12">

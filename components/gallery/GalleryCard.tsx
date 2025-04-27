@@ -16,7 +16,7 @@ export default function GalleryCard({ project }: { project: any }) {
 
   return (
     <Link href={`/gallery/${project.id}`}>
-      <div className="border rounded-lg overflow-hidden shadow hover:shadow-lg transition group">
+      <div className="border rounded-none overflow-hidden shadow hover:shadow-lg transition group">
         {cover ? (
           <div className="relative w-full h-60 overflow-hidden">
             <Image

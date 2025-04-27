@@ -16,7 +16,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-40 backdrop-blur-sm">
       <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="bg-white rounded-lg shadow-lg w-full max-w-xl relative animate-fadeIn">
+        <div className="bg-white rounded-none shadow-lg w-full max-w-xl relative animate-fadeIn">
           <div className="flex justify-between items-center px-6 py-4 border-b">
             <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
             <button onClick={onClose} aria-label="Close modal">

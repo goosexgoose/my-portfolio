@@ -27,7 +27,7 @@ export default function GalleryLightbox({ images, singleMode = false }: Props) {
           <img
             src={image.src}
             alt={image.title || ''}
-            className="rounded-lg shadow-md cursor-zoom-in"
+            className="rounded-none shadow-md cursor-zoom-in"
             style={{
               maxHeight: '80vh',
               objectFit: 'contain',
@@ -53,7 +53,7 @@ export default function GalleryLightbox({ images, singleMode = false }: Props) {
             key={idx}
             src={img.src}
             alt={img.title || ''}
-            className="rounded-lg shadow-md cursor-zoom-in"
+            className="rounded-none shadow-md cursor-zoom-in"
             onClick={() => setOpen(true)}
           />
         ))}

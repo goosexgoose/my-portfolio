@@ -89,7 +89,7 @@ export default function LoginOverlay() {
 
   return (
     <div className={`fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 ${fadeIn ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
-      <div className="bg-white rounded-lg p-8 w-full max-w-sm shadow-lg">
+      <div className="bg-white rounded-none p-8 w-full max-w-sm shadow-lg">
         <h2 className="text-center text-2xl font-semibold mb-6">{isLogin ? 'Login' : 'Register'}</h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col space-y-4">

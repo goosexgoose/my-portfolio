@@ -46,7 +46,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   const linkHref = `/projects/${encodeURIComponent(project.category)}/${project.id}`;
 
   return (
-    <div className="border rounded-lg shadow bg-white hover:shadow-lg transition-all p-4 group">
+    <div className="border rounded-none shadow bg-white hover:shadow-lg transition-all p-4 group">
       {cover && (
         <div className="mb-3 overflow-hidden rounded">
           <img

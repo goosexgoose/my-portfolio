@@ -40,13 +40,13 @@ export default function PhotographyMasonry({ photos }: PhotographyMasonryProps) 
         {photos.map((photo, index) => (
           <div
             key={photo.id}
-            className="mb-6 overflow-hidden rounded-lg cursor-pointer hover:opacity-90 transition-transform transform hover:scale-105 duration-300"
+            className="mb-6 overflow-hidden rounded-none cursor-pointer hover:opacity-90 transition-transform transform hover:scale-105 duration-300"
             onClick={() => setLightboxIndex(index)}
           >
             <img
               src={photo.src}
               alt={photo.alt || 'Photography'}
-              className="w-full h-auto rounded-lg object-cover"
+              className="w-full h-auto rounded-none object-cover"
             />
           </div>
         ))}

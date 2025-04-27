@@ -103,7 +103,7 @@ export default function GalleryPage() {
           <img
             src="/pics/IMG_1415.jpeg"
             alt="Kaiya's film camera"
-            className="rounded-lg shadow-md object-cover w-full"
+            className="rounded-none shadow-md object-cover w-full"
           />
         </div>
         <div className="w-full md:w-1/2 space-y-4 text-base">
@@ -128,12 +128,12 @@ export default function GalleryPage() {
               <Link
                 key={photo.id}
                 href={`/projects/Photography/${photo.id}`}
-                className="block overflow-hidden rounded-lg hover:opacity-90 transition"
+                className="block overflow-hidden rounded-none hover:opacity-90 transition"
               >
                 <img
                   src={photo.src}
                   alt={photo.alt || 'Photography'}
-                  className="w-full h-auto object-cover rounded-lg"
+                  className="w-full h-auto object-cover rounded-none"
                 />
               </Link>
             ))}
@@ -153,12 +153,12 @@ export default function GalleryPage() {
                 <Link
                   key={photo.id}
                   href={`/projects/Photography/${photo.id}`}
-                  className="block overflow-hidden rounded-lg hover:opacity-90 transition"
+                  className="block overflow-hidden rounded-none hover:opacity-90 transition"
                 >
                   <img
                     src={photo.src}
                     alt={photo.alt || 'Photography'}
-                    className="w-full h-auto object-cover rounded-lg mb-6"
+                    className="w-full h-auto object-cover rounded-none mb-6"
                   />
                 </Link>
               ))}

@@ -183,7 +183,7 @@ export default function ProjectsPage() {
               return (
                 <section key={cat} id={cat.toLowerCase()} className="space-y-6">
                   <h2 className="text-xl font-semibold">{cat} Projects</h2>
-                  <div className="border rounded-lg p-4 bg-white">
+                  <div className="border rounded-none p-4 bg-white">
                     <PhotographyMasonry photos={photos} />
                   </div>
                 </section>

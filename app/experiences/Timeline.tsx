@@ -1,4 +1,3 @@
-// Timeline.tsx
 'use client';
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
@@ -9,7 +8,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const workExperiences = [
-  // Each job now includes a color or gradient for the progress line and dot
   {
     company: 'TikTok',
     gradient: 'linear-gradient(135deg, #000000, #111111)',
@@ -40,7 +38,7 @@ const workExperiences = [
   },
   {
     company: 'ByteDance',
-    color: '#0070f3', // keep default blue
+    color: '#0070f3',
     logo: '/pics/ByteDance_Logo-1536x265-873688352.png',
     title: 'Douyin Encyclopaedia - Product Strategy Specialist',
     responsibilities: [
@@ -84,124 +82,116 @@ export default function Timeline() {
   const progressRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const defaultColor = workExperiences[0].gradient || workExperiences[0].color;
-    if (progressRef.current) progressRef.current.style.background = defaultColor || '#000000'; // Fallback to black
     const ctx = gsap.context(() => {
       const items = gsap.utils.toArray(`.${styles.timelineItem}`) as HTMLElement[];
 
       items.forEach((item, index) => {
-        const color = workExperiences[index].gradient || workExperiences[index].color;
-
-        ScrollTrigger.create({
-        trigger: item,
-        start: 'bottom bottom',
-        end: '+=1', // short range to snap change
-        onEnter: () => {
-          if (progressRef.current) progressRef.current.style.background = color || '#000000'; // Fallback to black
-          const dot = item.querySelector(`.${styles.timelineDot}`) as HTMLElement;
-          if (dot) dot.style.background = color || '#000000'; // Fallback to black
-        },
-        onEnterBack: () => {
-          if (progressRef.current) progressRef.current.style.background = color || '#000000';
-          const dot = item.querySelector(`.${styles.timelineDot}`) as HTMLElement;
-          if (dot) dot.style.background = color || '#000000'; // Fallback to black
-        },
-      });
-      });
-
-      gsap.to(progressRef.current, {
-        scrollTrigger: {
-          trigger: timelineRef.current,
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: true,
-        },
-        height: '100%',
-        ease: 'none',
-      });
-
-      items.forEach((item) => {
-        const content = item.querySelector(`.${styles.timelineRight}`) as HTMLElement;
+        const color = workExperiences[index].gradient || workExperiences[index].color || '#000000';
         const dot = item.querySelector(`.${styles.timelineDot}`) as HTMLElement;
-        const date = item.querySelector(`.${styles.timelineDate}`) as HTMLElement;
-
-        gsap.to([dot, date], {
-          scrollTrigger: {
-            trigger: item,
-            start: 'top bottom',
-            end: 'bottom center-=10%',
-            scrub: true,
-          },
-          y: 100,
-          ease: 'none'
-        });
-
-        // Parallax timelineRight
-        gsap.fromTo(
-          content,
-          { y: 50, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            scrollTrigger: {
-              trigger: item,
-              start: 'top bottom',
-              end: 'bottom center',
-              scrub: true
-            },
-            ease: 'none'
-          }
-        );
+        const content = item.querySelector(`.${styles.timelineRight}`) as HTMLElement;
 
         ScrollTrigger.create({
           trigger: item,
-          start: 'top 80%',
-          end: 'bottom 20%',
-          toggleClass: { targets: content, className: styles.active },
+          start: 'top center+=100',
+          end: 'bottom center-=100',
+          onEnter: () => {
+            if (dot) dot.style.background = color;
+          },
+          onEnterBack: () => {
+            if (dot) dot.style.background = color;
+          },
         });
+
+        gsap.fromTo(
+          content,
+          { opacity: 0, y: 50 },
+          {
+            opacity: 1,
+            y: 0,
+            scrollTrigger: {
+              trigger: item,
+              start: 'top bottom',
+              end: 'top center',
+              scrub: true,
+            },
+          }
+        );
       });
+
+      if (progressRef.current) {
+        gsap.to(progressRef.current, {
+          backgroundPosition: '0% 100%',
+          ease: 'none',
+          scrollTrigger: {
+            trigger: timelineRef.current,
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: true,
+          },
+        });
+      }
     }, timelineRef);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <section ref={timelineRef} className={styles.timelineSection}>
-      <h2 className={styles.timelineTitle}>Career Timeline</h2>
-      <div className={styles.timelineLineWrapper}>
-        <div ref={progressRef} className={styles.timelineProgress}></div>
-      </div>
+    <section ref={timelineRef} className="relative max-w-5xl mx-auto px-4 py-12">
+      <h2 className="text-3xl font-bold text-center mb-12">Career Timeline</h2>
 
-      <div className={styles.timelineGrid}>
-        {workExperiences.map((job, idx) => (
-          <div key={idx} className={styles.timelineItem}>
-            <div className={styles.timelineMeta}>
-              <div className={`${styles.timelineDate} ${job.isToday ? styles.todayDate : ''}`}>{job.dates}</div>
-              <div className={`${styles.timelineDot} ${job.isToday ? styles.todayDot : ''}`}></div>
-            </div>
+      {/* 只控制内容区 */}
+      <div className="relative">
+        {/* Progress Line */}
+        <div className="absolute top-0 left-1/2 md:left-[20%] transform -translate-x-1/2 md:translate-x-0 w-[2px] h-full bg-gray-300 overflow-hidden z-0">
+          <div
+            ref={progressRef}
+            className="w-full h-full"
+            style={{
+              background: 'linear-gradient(to bottom, transparent, #000000, #0070f3, #e52e71, transparent)',
+              backgroundSize: '100% 300%',
+              backgroundPosition: '0% 0%',
+            }}
+          ></div>
+        </div>
 
-            <div className={`${styles.timelineRight} ${job.isToday ? styles.todayHighlight : ''}`}>
-              <Image
-                src={job.logo}
-                alt={job.company}
-                width={120}
-                height={40}
-                className={styles.timelineLogo}
-              />
-              {job.isToday && <span className={styles.todayBadge}>NOW</span>}
-              <h3>{job.title}</h3>
-              <p>
-                <strong>{job.company}</strong> — {job.type}
-              </p>
-              <p className={styles.timelineLocation}>{job.location}</p>
-              <ul>
-                {job.responsibilities.map((r, i) => (
-                  <li key={i}>{r}</li>
-                ))}
-              </ul>
+        {/* Timeline Items */}
+        <div className="space-y-24">
+          {workExperiences.map((job, idx) => (
+            <div
+              key={idx}
+              className={`${styles.timelineItem} relative flex flex-col md:flex-row items-center md:items-start`}
+            >
+              {/* 时间 + Dot */}
+              <div className="relative w-full md:w-[20%] text-center md:text-right pr-6 md:pr-8 mb-4 md:mb-0">
+                <div className="text-gray-400 text-sm">{job.dates}</div>
+                <div
+                  className={`${styles.timelineDot} absolute left-1/2 md:right-0 md:left-auto transform -translate-x-1/2 md:translate-x-1/2 top-6 w-4 h-4 bg-black rounded-full z-10`}
+                />
+              </div>
+
+              {/* 内容区 */}
+              <div className={`${styles.timelineRight} w-full md:w-[80%] pt-8 md:pt-0`}>
+                <Image
+                  src={job.logo}
+                  alt={job.company}
+                  width={120}
+                  height={40}
+                  className="mb-2"
+                />
+                <h3 className="text-xl font-semibold">{job.title}</h3>
+                <p className="text-gray-600 mb-1">
+                  <strong>{job.company}</strong> — {job.type}
+                </p>
+                <p className="text-gray-400 mb-2">{job.location}</p>
+                <ul className="list-disc list-inside text-gray-700">
+                  {job.responsibilities.map((r, i) => (
+                    <li key={i}>{r}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

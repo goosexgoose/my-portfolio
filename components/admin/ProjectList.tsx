@@ -142,7 +142,7 @@ export default function ProjectList({ onEditProject }: ProjectListProps) {
       {/* 项目列表 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredProjects.map((p) => (
-          <div key={p.id} className="relative border p-4 rounded-lg shadow hover:shadow-md">
+          <div key={p.id} className="relative border p-4 rounded-none shadow hover:shadow-md">
             {/* Checkbox 右上角 */}
             <div className="absolute top-2 right-2">
               <input

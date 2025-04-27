@@ -125,7 +125,7 @@ export default function RichContentViewer({ content }: { content: any }) {
                     maxWidth: '90vw',
                     maxHeight: '80vh',
                     objectFit: 'contain',
-                    borderRadius: '8px',
+                    
                     boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
                     cursor: 'zoom-out',
                   }}

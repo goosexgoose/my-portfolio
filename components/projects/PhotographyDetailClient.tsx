@@ -42,7 +42,7 @@ export default function PhotographyDetailClient({ layout }: Props) {
             src={photos[0].src}
             alt={photos[0].title || ''}
             onClick={() => openLightbox(0)}
-            className="rounded-lg cursor-pointer hover:scale-105 transition-transform duration-300 max-w-3xl w-full object-cover"
+            className="rounded-none cursor-pointer hover:scale-105 transition-transform duration-300 max-w-3xl w-full object-cover"
             style={{ maxHeight: '80vh', objectFit: 'contain' }}
           />
         </div>
@@ -56,13 +56,13 @@ export default function PhotographyDetailClient({ layout }: Props) {
           {photos.map((photo, idx) => (
             <div
               key={idx}
-              className="mb-4 overflow-hidden rounded-lg cursor-pointer group"
+              className="mb-4 overflow-hidden rounded-none cursor-pointer group"
               onClick={() => openLightbox(idx)}
             >
               <img
                 src={photo.src}
                 alt={photo.title || ''}
-                className="w-full object-cover rounded-lg hover:scale-105 transition-transform duration-300"
+                className="w-full object-cover rounded-none hover:scale-105 transition-transform duration-300"
               />
             </div>
           ))}
