@@ -21,8 +21,6 @@ interface MySlide {
 }
 
 export default function RichContentViewer({ content }: { content: any }) {
-  console.log('RichContentViewer received content:', content);
-
   const [open, setOpen] = useState(false);
   const [slides, setSlides] = useState<MySlide[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -61,12 +59,8 @@ export default function RichContentViewer({ content }: { content: any }) {
       }),
       Link,
       Youtube.configure({
-        width: 640,
-        height: 360,
-        allowFullscreen: true,
         HTMLAttributes: {
-          class: 'youtube-video',
-          frameborder: '0',
+          class: 'w-full h-auto aspect-video rounded-md',
         },
       }),
       Underline,
@@ -76,7 +70,7 @@ export default function RichContentViewer({ content }: { content: any }) {
       Highlight,
     ],
     editable: false,
-    content,
+    content: content && typeof content === 'object' ? content : null,
   });
 
   const handleImageClickFromDom = useCallback((e: MouseEvent) => {
@@ -108,7 +102,7 @@ export default function RichContentViewer({ content }: { content: any }) {
   if (!editor) return null;
 
   return (
-    <div className="prose max-w-none tiptap">
+    <div className="prose max-w-none tiptap [&_.youtube-video]:w-full [&_.youtube-video]:aspect-video [&_.youtube-video]:rounded-md">
       <EditorContent editor={editor} />
 
       <Lightbox
@@ -117,7 +111,7 @@ export default function RichContentViewer({ content }: { content: any }) {
         slides={slides}
         plugins={[Zoom]}
         index={currentIndex}
-        carousel={{ finite: false }}
+        animation={{ fade: 1, zoom: 1 }}
         controller={{ closeOnPullDown: true }}
         render={{
           slide: ({ slide }) => {

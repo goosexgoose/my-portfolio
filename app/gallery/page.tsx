@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { db, auth } from '@/lib/firebaseClient';
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 import Masonry from 'react-masonry-css';
 import Link from 'next/link';
-import { onAuthStateChanged } from 'firebase/auth';
-import LoginOverlay from '@/components/auth/LoginOverlay'; // ✅ 记得引入
+import LoginOverlay from '@/components/auth/LoginOverlay';
 
 interface PhotoItem {
   id: string;
@@ -29,18 +29,19 @@ export default function GalleryPage() {
 
   useEffect(() => {
     (async () => {
-      const baseQuery = query(
+      const q = query(
         collection(db, 'projects'),
         where('status', '==', 'published'),
-        where('category', '==', 'Photography'),
+        where('category', '==', 'Photography')
       );
-      const snapshot = await getDocs(baseQuery);
+      const snapshot = await getDocs(q);
       const recent: PhotoItem[] = [];
       const all: PhotoItem[] = [];
 
       snapshot.docs.forEach((doc) => {
         const data = doc.data();
-        const layout = data.layout?.en || data.layout?.zh || null;
+        const layout = data.layout?.en || data.layout?.zh || data.layout || null;
+
         if (!layout || !Array.isArray(layout.content)) return;
 
         const firstImage = findFirstImage(layout.content);
@@ -88,42 +89,47 @@ export default function GalleryPage() {
   }
 
   return (
-    <div className="relative max-w-7xl mx-auto px-4 pt-10 pb-20 space-y-12">
+    <div className="relative max-w-7xl mx-auto px-4 pt-10 pb-20 space-y-16">
+      
+      {/* Top Intro */}
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold">Photography Gallery</h1>
-       
+        <p className="text-gray-500 text-sm">Recent Works are public. Full archive available after login.</p>
       </div>
-      <div className="max-w-4xl mx-auto px-4 py-12 flex flex-col md:flex-row items-start gap-8">
-        {/* 左边图片 */}
-        <div className="w-full md:w-1/2 flex-shrink-0">
+
+      {/* Personal Intro Section */}
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-8 items-center text-gray-700">
+        <div className="w-full md:w-1/2">
           <img
             src="/pics/IMG_1415.jpeg"
             alt="Kaiya's film camera"
-            className="rounded-lg shadow-md w-full object-cover"
+            className="rounded-lg shadow-md object-cover w-full"
           />
         </div>
-
-        {/* 右边文字 */}
-        <div className="w-full md:w-1/2 space-y-4 text-gray-700">
+        <div className="w-full md:w-1/2 space-y-4 text-base">
           <p>
-            I am passionate about walking the streets to capture the daily lives of ordinary people, but I also love the landscape and architecture.
-            I think the charm of photography is to capture the moment, and the emotion within. Every moment is frozen in a photograph, what a beautiful invention.
-            I particularly like film cameras and the unique texture it brings.
+            I am passionate about walking the streets to capture the daily lives of ordinary people,
+            but I also love landscapes and architecture. The charm of photography lies in capturing
+            emotions within fleeting moments — a beautiful invention.
           </p>
           <p>
-            The cameras I use most often are a Ricoh GR2 and a Canon Prima Super 90 Wide.
+            I especially love film cameras for their unique textures. My favorite gears are Ricoh GR2
+            and Canon Prima Super 90 Wide.
           </p>
         </div>
       </div>
 
-
       {/* Recent Works */}
-      <section className="space-y-4">
+      <section className="space-y-6">
         <h2 className="text-2xl font-semibold">Recent Works</h2>
         {recentWorks.length > 0 ? (
           <Masonry breakpointCols={breakpointColumnsObj} className="flex gap-4" columnClassName="masonry-column">
             {recentWorks.map((photo) => (
-              <Link key={photo.id} href={`/gallery/${photo.id}`} className="group block overflow-hidden rounded-lg hover:opacity-90 transition">
+              <Link
+                key={photo.id}
+                href={`/projects/Photography/${photo.id}`}
+                className="block overflow-hidden rounded-lg hover:opacity-90 transition"
+              >
                 <img
                   src={photo.src}
                   alt={photo.alt || 'Photography'}
@@ -138,21 +144,23 @@ export default function GalleryPage() {
       </section>
 
       {/* All Works */}
-      <section className="relative space-y-4">
+      <section className="relative space-y-6">
         <h2 className="text-2xl font-semibold">All Works</h2>
         {user ? (
           allWorks.length > 0 ? (
             <Masonry breakpointCols={breakpointColumnsObj} className="flex gap-6" columnClassName="masonry-column">
               {allWorks.map((photo) => (
-                <div key={photo.id} className="mb-6">
-                  <Link href={`/gallery/${photo.id}`} className="group block overflow-hidden rounded-lg hover:opacity-90 transition">
-                    <img
-                      src={photo.src}
-                      alt={photo.alt || 'Photography'}
-                      className="w-full h-auto object-cover rounded-lg"
-                    />
-                  </Link>
-                </div>
+                <Link
+                  key={photo.id}
+                  href={`/projects/Photography/${photo.id}`}
+                  className="block overflow-hidden rounded-lg hover:opacity-90 transition"
+                >
+                  <img
+                    src={photo.src}
+                    alt={photo.alt || 'Photography'}
+                    className="w-full h-auto object-cover rounded-lg mb-6"
+                  />
+                </Link>
               ))}
             </Masonry>
           ) : (
@@ -164,6 +172,7 @@ export default function GalleryPage() {
           </div>
         )}
       </section>
+
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import ProjectList from './ProjectList';
 import ProjectEditor from './ProjectEditor';
-import ProjectEditModal from './ProjectEditModal'; 
+import ProjectEditModal from './ProjectEditModal';
 import AdminCVUploader from './AdminCVUploader';
 
 interface Project {
@@ -25,8 +25,8 @@ export default function AdminTabs() {
   const searchParams = useSearchParams();
   const currentTab = searchParams.get('tab') || 'manage';
 
-  const [tab, setTab] = useState(currentTab);
-  const [editingProject, setEditingProject] = useState<Project | null>(null); // ✅ 新增编辑状态
+  const [tab, setTab] = useState<string>(currentTab);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   useEffect(() => {
     setTab(currentTab);
@@ -64,11 +64,14 @@ export default function AdminTabs() {
               <ProjectEditModal
                 project={editingProject}
                 onClose={() => setEditingProject(null)}
+                onSaveSuccess={() => setEditingProject(null)}
               />
             )}
           </>
         )}
+
         {tab === 'create' && <ProjectEditor />}
+
         {tab === 'cv' && (
           <div>
             <h2 className="text-xl font-bold mb-4">Resume Management</h2>
@@ -92,7 +95,9 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2 rounded-t ${selected ? 'bg-black text-white' : 'bg-gray-200 text-gray-600'}`}
+      className={`px-4 py-2 rounded-t ${
+        selected ? 'bg-black text-white' : 'bg-gray-200 text-gray-600'
+      }`}
     >
       {children}
     </button>

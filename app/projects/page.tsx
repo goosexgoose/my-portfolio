@@ -14,18 +14,31 @@ interface Project {
   id: string;
   title: string;
   description: string;
-  tags?: string[];  
+  tags?: string[];
   category: 'Coding' | 'Localization' | 'Photography';
   coverUrl?: string;
   layout?: any;
   status: 'draft' | 'published';
   createdAt?: { toDate: () => Date };
-  updatedAt?: { toDate: () => Date };  
-  isRecentWork?: boolean; 
+  updatedAt?: { toDate: () => Date };
+  isRecentWork?: boolean;
 }
 
-
 const categories = ['Coding', 'Localization', 'Photography'];
+const findFirstImage = (nodes: any[]): { src: string; alt?: string } | null => {
+  if (!Array.isArray(nodes)) return null;
+  for (const node of nodes) {
+    if (node.type === 'image' && node.attrs?.src) {
+      return { src: node.attrs.src, alt: node.attrs.alt };
+    }
+    if (Array.isArray(node.content)) {
+      const found = findFirstImage(node.content);
+      if (found) return found;
+    }
+  }
+  return null;
+};
+
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -36,7 +49,6 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  // Fetch all published projects
   useEffect(() => {
     (async () => {
       const baseQuery = query(collection(db, 'projects'), where('status', '==', 'published'));
@@ -48,16 +60,15 @@ export default function ProjectsPage() {
       setProjects(all);
       setLoading(false);
     })();
-    
   }, []);
 
   useEffect(() => {
     const handleScroll = () => {
       const sections = categories.map((cat) => document.getElementById(cat.toLowerCase()));
-      const scrollPosition = window.scrollY + 150; 
-  
+      const scrollPosition = window.scrollY + 150;
+
       let current: string | null = null;
-  
+
       sections.forEach((section) => {
         if (section) {
           const offsetTop = section.offsetTop;
@@ -66,16 +77,14 @@ export default function ProjectsPage() {
           }
         }
       });
-  
+
       setActiveSection(current);
     };
-  
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [categories]);
-  
+  }, []);
 
-  // Filter + Search + Sort logic
   const filtered = useMemo(() => {
     let result = [...projects];
 
@@ -108,7 +117,6 @@ export default function ProjectsPage() {
     return result;
   }, [projects, filterCategory, searchTerm, sortBy]);
 
-  // Group by category
   const grouped = useMemo(() => {
     const res: Record<string, Project[]> = {
       Coding: [],
@@ -127,22 +135,17 @@ export default function ProjectsPage() {
 
   return (
     <div className="flex flex-col sm:flex-row max-w-7xl mx-auto px-4 pt-10 pb-20 gap-6 min-h-screen">
+      <div className="hidden sm:block w-48">
+        <ProjectSidebar
+          categories={categories}
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          activeSection={activeSection}
+        />
+      </div>
 
-<div className="hidden sm:block w-48">
-    <ProjectSidebar
-      categories={categories}
-      sidebarOpen={sidebarOpen}
-      setSidebarOpen={setSidebarOpen}
-      activeSection={activeSection}
-    />
-  </div>
-
-
-
-      {/* Mobile Sidebar Button */}
       <SidebarToggleButton sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-      {/* Main Content */}
       <main className="flex-1 space-y-10">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">My Projects</h1>
@@ -158,30 +161,48 @@ export default function ProjectsPage() {
           setSortBy={setSortBy}
         />
 
-        {/* Grouped projects by category */}
-        {categories.map((cat) => {
-          const list = grouped[cat];
-          if (!list.length) return null;
+          {categories.map((cat) => {
+            const list = grouped[cat];
+            if (!list.length) return null;
 
-          return cat === 'Photography' ? (
-            <section key={cat} id={cat.toLowerCase()} className="space-y-6">
-              <h2 className="text-xl font-semibold">{cat} Projects</h2>
-              {/* Insert Masonry layout */}
-              <div className="border rounded-lg p-4 bg-white">
-                <PhotographyMasonry />
-              </div>
-            </section>
-          ) : (
-            <section key={cat} id={cat.toLowerCase()} className="space-y-6">
-              <h2 className="text-xl font-semibold">{cat} Projects</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {list.map((proj) => (
-                  <ProjectCard key={proj.id} project={proj} />
-                ))}
-              </div>
-            </section>
-          );
-        })}
+            if (cat === 'Photography') {
+              const photos = list
+                .sort((a, b) => (new Date(b.createdAt?.toDate?.() ?? 0)).getTime() - (new Date(a.createdAt?.toDate?.() ?? 0)).getTime())
+                .slice(0, 9)
+                .map((proj) => {
+                  const layout = proj.layout?.en || proj.layout?.zh || proj.layout || null;
+                  const firstImage = findFirstImage(layout?.content || []);
+                  return {
+                    id: proj.id,
+                    src: firstImage?.src || '',
+                    alt: proj.description || '',
+                  };
+                })
+                .filter(p => p.src); // 过滤掉没有图片的
+
+              return (
+                <section key={cat} id={cat.toLowerCase()} className="space-y-6">
+                  <h2 className="text-xl font-semibold">{cat} Projects</h2>
+                  <div className="border rounded-lg p-4 bg-white">
+                    <PhotographyMasonry photos={photos} />
+                  </div>
+                </section>
+              );
+            }
+
+  // 非Photography的正常走原来的list
+  return (
+    <section key={cat} id={cat.toLowerCase()} className="space-y-6">
+      <h2 className="text-xl font-semibold">{cat} Projects</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {list.map((proj) => (
+          <ProjectCard key={proj.id} project={proj} />
+        ))}
+      </div>
+    </section>
+  );
+})}
+
       </main>
     </div>
   );

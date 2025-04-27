@@ -6,14 +6,14 @@ interface Project {
   id: string;
   title: string;
   description: string;
-  tags?: string[];  
+  tags?: string[];
   category: 'Coding' | 'Localization' | 'Photography';
   coverUrl?: string;
   layout?: any;
   status: 'draft' | 'published';
   createdAt?: { toDate: () => Date };
-  updatedAt?: { toDate: () => Date };  
-  isRecentWork?: boolean; 
+  updatedAt?: { toDate: () => Date };
+  isRecentWork?: boolean;
 }
 
 interface ProjectCardProps {
@@ -25,7 +25,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     const layout = project.layout;
     try {
       const layoutObj = typeof layout === 'string' ? JSON.parse(layout) : layout;
-      const doc = layoutObj?.en || layoutObj?.zh;
+      const doc = layoutObj?.en || layoutObj?.zh || layoutObj;
       if (!doc || !Array.isArray(doc.content)) return null;
 
       const firstImageNode = doc.content.find(
@@ -43,6 +43,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   }
 
   const cover = getCoverImageUrl(project);
+  const linkHref = `/projects/${encodeURIComponent(project.category)}/${project.id}`;
 
   return (
     <div className="border rounded-lg shadow bg-white hover:shadow-lg transition-all p-4 group">
@@ -57,7 +58,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           />
         </div>
       )}
-      <h3 className="text-lg font-semibold line-clamp-1">{project.title}</h3>
+      <h3 className="text-lg font-semibold line-clamp-1">
+        <Link href={linkHref} className="hover:underline">
+          {project.title}
+        </Link>
+      </h3>
       <p className="text-sm text-gray-600 line-clamp-2 mb-2">{project.description}</p>
       <div className="flex flex-wrap gap-1 text-xs mb-3">
         {(project.tags || []).map((tag: string, i: number) => (
@@ -67,7 +72,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         ))}
       </div>
       <Link
-        href={`/projects/${project.id}`}
+        href={linkHref}
         className="text-blue-600 text-sm hover:underline"
       >
         View Details →
