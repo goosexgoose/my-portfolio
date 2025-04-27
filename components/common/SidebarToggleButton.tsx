@@ -12,7 +12,7 @@ export default function SidebarToggleButton({ sidebarOpen, setSidebarOpen }: Pro
     <button
       aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
       onClick={() => setSidebarOpen(!sidebarOpen)}
-      className="sm:hidden fixed bottom-4 left-4 z-50 bg-black text-white rounded-full p-2 shadow-lg"
+      className="sm:hidden fixed bottom-4 left-4 z-50 bg-black text-white rounded-full p-2 shadow-lg transition-all duration-300 hover:bg-gray-800"
     >
       {sidebarOpen ? (
         <XMarkIcon className="h-6 w-6" />

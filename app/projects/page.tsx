@@ -34,6 +34,7 @@ export default function ProjectsPage() {
   const [sortBy, setSortBy] = useState('createdDesc');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   // Fetch all published projects
   useEffect(() => {
@@ -47,7 +48,32 @@ export default function ProjectsPage() {
       setProjects(all);
       setLoading(false);
     })();
+    
   }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = categories.map((cat) => document.getElementById(cat.toLowerCase()));
+      const scrollPosition = window.scrollY + 150; 
+  
+      let current: string | null = null;
+  
+      sections.forEach((section) => {
+        if (section) {
+          const offsetTop = section.offsetTop;
+          if (scrollPosition >= offsetTop) {
+            current = section.id;
+          }
+        }
+      });
+  
+      setActiveSection(current);
+    };
+  
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [categories]);
+  
 
   // Filter + Search + Sort logic
   const filtered = useMemo(() => {
@@ -100,9 +126,18 @@ export default function ProjectsPage() {
   }
 
   return (
-    <div className="relative flex flex-col sm:flex-row max-w-7xl mx-auto px-4 pt-10 pb-20 gap-6">
-      {/* Sidebar */}
-      <ProjectSidebar categories={categories} sidebarOpen={sidebarOpen} />
+    <div className="flex flex-col sm:flex-row max-w-7xl mx-auto px-4 pt-10 pb-20 gap-6 min-h-screen">
+
+<div className="hidden sm:block w-48">
+    <ProjectSidebar
+      categories={categories}
+      sidebarOpen={sidebarOpen}
+      setSidebarOpen={setSidebarOpen}
+      activeSection={activeSection}
+    />
+  </div>
+
+
 
       {/* Mobile Sidebar Button */}
       <SidebarToggleButton sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
