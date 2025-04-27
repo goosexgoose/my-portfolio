@@ -51,12 +51,13 @@ export default async function ProjectDetailPage({ params }: Props) {
       </div>
 
       {/* Title + Desc */}
-      <div className="space-y-4 text-center">
+      <div className={`space-y-4 ${isPhotography ? 'text-center' : 'text-left'}`}>
         <h1 className="text-3xl font-bold">{project.title}</h1>
         {project.description && (
           <p className="text-gray-600">{project.description}</p>
         )}
       </div>
+
 
       {/* Content */}
       {isPhotography ? (
