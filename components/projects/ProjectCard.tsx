@@ -6,10 +6,14 @@ interface Project {
   id: string;
   title: string;
   description: string;
-  tech: string[];
+  tags?: string[];  
   category: 'Coding' | 'Localization' | 'Photography';
   coverUrl?: string;
   layout?: any;
+  status: 'draft' | 'published';
+  createdAt?: { toDate: () => Date };
+  updatedAt?: { toDate: () => Date };  
+  isRecentWork?: boolean; 
 }
 
 interface ProjectCardProps {
@@ -56,7 +60,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       <h3 className="text-lg font-semibold line-clamp-1">{project.title}</h3>
       <p className="text-sm text-gray-600 line-clamp-2 mb-2">{project.description}</p>
       <div className="flex flex-wrap gap-1 text-xs mb-3">
-        {project.tech.map((tag, i) => (
+        {(project.tags || []).map((tag: string, i: number) => (
           <span key={i} className="bg-gray-100 border px-2 py-0.5 rounded">
             {tag}
           </span>

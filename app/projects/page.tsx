@@ -14,13 +14,16 @@ interface Project {
   id: string;
   title: string;
   description: string;
-  tech: string[];
+  tags?: string[];  
   category: 'Coding' | 'Localization' | 'Photography';
   coverUrl?: string;
   layout?: any;
   status: 'draft' | 'published';
   createdAt?: { toDate: () => Date };
+  updatedAt?: { toDate: () => Date };  
+  isRecentWork?: boolean; 
 }
+
 
 const categories = ['Coding', 'Localization', 'Photography'];
 
@@ -56,7 +59,7 @@ export default function ProjectsPage() {
 
     if (searchTerm) {
       result = result.filter((p) =>
-        (p.title + p.description + p.tech.join(','))
+        (p.title + p.description + (p.tags || []).join(','))
           .toLowerCase()
           .includes(searchTerm.toLowerCase())
       );

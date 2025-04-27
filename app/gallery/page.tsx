@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { db } from '@/lib/firebaseClient';
-import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+import { db, auth } from '@/lib/firebaseClient';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import Masonry from 'react-masonry-css';
 import Link from 'next/link';
+import { onAuthStateChanged } from 'firebase/auth';
+import LoginOverlay from '@/components/auth/LoginOverlay'; // ✅ 记得引入
 
 interface PhotoItem {
   id: string;
@@ -16,6 +18,14 @@ export default function GalleryPage() {
   const [recentWorks, setRecentWorks] = useState<PhotoItem[]>([]);
   const [allWorks, setAllWorks] = useState<PhotoItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<{ email?: string } | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser ? { email: firebaseUser.email || undefined } : null);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -78,13 +88,34 @@ export default function GalleryPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 pt-10 pb-20 space-y-12">
+    <div className="relative max-w-7xl mx-auto px-4 pt-10 pb-20 space-y-12">
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold">Photography Gallery</h1>
-        <p className="text-gray-500 text-sm">
-          Recent Works are open to public. Full archive available after login.
-        </p>
+       
       </div>
+      <div className="max-w-4xl mx-auto px-4 py-12 flex flex-col md:flex-row items-start gap-8">
+        {/* 左边图片 */}
+        <div className="w-full md:w-1/2 flex-shrink-0">
+          <img
+            src="/pics/IMG_1415.jpeg"
+            alt="Kaiya's film camera"
+            className="rounded-lg shadow-md w-full object-cover"
+          />
+        </div>
+
+        {/* 右边文字 */}
+        <div className="w-full md:w-1/2 space-y-4 text-gray-700">
+          <p>
+            I am passionate about walking the streets to capture the daily lives of ordinary people, but I also love the landscape and architecture.
+            I think the charm of photography is to capture the moment, and the emotion within. Every moment is frozen in a photograph, what a beautiful invention.
+            I particularly like film cameras and the unique texture it brings.
+          </p>
+          <p>
+            The cameras I use most often are a Ricoh GR2 and a Canon Prima Super 90 Wide.
+          </p>
+        </div>
+      </div>
+
 
       {/* Recent Works */}
       <section className="space-y-4">
@@ -107,25 +138,30 @@ export default function GalleryPage() {
       </section>
 
       {/* All Works */}
-      <section className="space-y-4">
+      <section className="relative space-y-4">
         <h2 className="text-2xl font-semibold">All Works</h2>
-        {allWorks.length > 0 ? (
-          <Masonry breakpointCols={breakpointColumnsObj} className="flex gap-6" columnClassName="masonry-column">
-          {allWorks.map((photo) => (
-            <div key={photo.id} className="mb-6">
-              <Link href={`/gallery/${photo.id}`} className="group block overflow-hidden rounded-lg hover:opacity-90 transition">
-                <img
-                  src={photo.src}
-                  alt={photo.alt || 'Photography'}
-                  className="w-full h-auto object-cover rounded-lg"
-                />
-              </Link>
-            </div>
-          ))}
-        </Masonry>
-        
+        {user ? (
+          allWorks.length > 0 ? (
+            <Masonry breakpointCols={breakpointColumnsObj} className="flex gap-6" columnClassName="masonry-column">
+              {allWorks.map((photo) => (
+                <div key={photo.id} className="mb-6">
+                  <Link href={`/gallery/${photo.id}`} className="group block overflow-hidden rounded-lg hover:opacity-90 transition">
+                    <img
+                      src={photo.src}
+                      alt={photo.alt || 'Photography'}
+                      className="w-full h-auto object-cover rounded-lg"
+                    />
+                  </Link>
+                </div>
+              ))}
+            </Masonry>
+          ) : (
+            <p className="text-gray-400 text-center">No works found.</p>
+          )
         ) : (
-          <p className="text-gray-400 text-center">No works found.</p>
+          <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-10">
+            <LoginOverlay />
+          </div>
         )}
       </section>
     </div>

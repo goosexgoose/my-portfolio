@@ -12,7 +12,7 @@ interface Props {
 export default async function GalleryDetailPage({ params }: Props) {
   const { id } = params;
 
-  // 当前作品
+  
   const docRef = adminDb.collection('projects').doc(id);
   const snapshot = await docRef.get();
 
@@ -25,7 +25,7 @@ export default async function GalleryDetailPage({ params }: Props) {
   const images = extractImagesFromLayout(layout);
   const filteredLayout = layout ? removeImagesFromLayout(layout) : null;
 
-  // 获取所有摄影作品（for "Next Project"）
+  // Find the next project ("Next Project"）
   const allProjectsSnap = await adminDb.collection('projects')
     .where('status', '==', 'published')
     .where('category', '==', 'Photography')
@@ -40,7 +40,7 @@ export default async function GalleryDetailPage({ params }: Props) {
   return (
     <div className="relative max-w-4xl mx-auto px-4 py-12 space-y-10">
 
-      {/* 返回 + 下个作品按钮 */}
+      
       <div className="flex justify-between items-center text-sm text-gray-500 pb-2">
         <Link href="/gallery" className="hover:underline">← Back to Gallery</Link>
 
@@ -54,12 +54,12 @@ export default async function GalleryDetailPage({ params }: Props) {
         )}
       </div>
 
-      {/* 大图 Lightbox */}
+      {/*Lightbox */}
       {images.length > 0 && (
         <GalleryLightbox images={images} singleMode />
       )}
 
-      {/* 标题、描述、标签 */}
+      {/* TAGS */}
       <div className="space-y-4 text-center">
         <h1 className="text-3xl font-bold">{project.title}</h1>
         {project.description && (
@@ -79,7 +79,7 @@ export default async function GalleryDetailPage({ params }: Props) {
         )}
       </div>
 
-      {/* 正文 富文本 */}
+      {/* Content */}
       {filteredLayout && (
         <div className="pt-8">
           <RichContentViewer content={filteredLayout} />
@@ -89,7 +89,7 @@ export default async function GalleryDetailPage({ params }: Props) {
   );
 }
 
-// ------- 提取图片 -------
+
 function extractImagesFromLayout(layout: any): { src: string; title?: string }[] {
   const result: { src: string; title?: string }[] = [];
   const doc = layout?.en || layout?.zh || layout;
@@ -113,7 +113,7 @@ function extractImagesFromLayout(layout: any): { src: string; title?: string }[]
   return result;
 }
 
-// ------- 过滤图片节点，保留文字 -------
+// ------- Remove images -------
 function removeImagesFromLayout(layout: any): any {
   const doc = layout?.en || layout?.zh || layout;
   if (!doc || doc.type !== 'doc' || !Array.isArray(doc.content)) return null;

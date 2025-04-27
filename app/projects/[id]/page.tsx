@@ -16,32 +16,58 @@ export default async function ProjectDetailPage({ params }: Props) {
   }
 
   const project = snapshot.data()!;
-  const layout = project.layout?.en || project.layout?.zh || null; 
+  const layout = project.layout || null; // ✅ Use layout directly
+
+  // Fetch all published projects
+  const allSnapshot = await adminDb.collection('projects')
+    .where('status', '==', 'published')
+    .orderBy('createdAt', 'asc')
+    .get();
+
+  const allProjects = allSnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as { id: string; title: string }[];
+
+  // Find the index of the current project
+  const currentIndex = allProjects.findIndex((p) => p.id === params.id);
+
+  // Find the next project; if at the end, cycle back to the first
+  const nextProject = currentIndex >= 0
+    ? allProjects[(currentIndex + 1) % allProjects.length]
+    : null;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 space-y-10">
-      {/* Navigation */}
+      {/* Top Navigation */}
       <div className="flex justify-between items-center text-sm text-gray-500 pb-4">
-        <Link href="/" className="hover:underline">← Home</Link>
-        <Link href="/projects" className="hover:underline">All Projects →</Link>
+        <Link href="/projects" className="hover:underline">← All Projects</Link>
+        {nextProject && (
+          <Link href={`/projects/${nextProject.id}`} className="hover:underline">
+            Next Project →
+          </Link>
+        )}
       </div>
 
-      {/* Cover Image */}
-      {project.coverUrl && (
-        <img
-          src={project.coverUrl}
-          alt="project cover"
-          className="w-full max-h-[400px] object-contain rounded-lg shadow"
-        />
-      )}
-
-      {/* Title + Description */}
+      {/* Title and Description */}
       <div>
         <h1 className="text-3xl font-bold">{project.title}</h1>
         <p className="text-gray-600 mt-2">{project.description}</p>
+        {project.tags && project.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-4">
+            {project.tags.map((tag: string, i: number) => (
+              <span
+                key={i}
+                className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full border"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Rich Content Viewer */}
+      {/* Rich Text Content */}
       {layout && (
         <div className="prose max-w-none">
           <RichContentViewer content={layout} />

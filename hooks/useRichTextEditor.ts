@@ -8,6 +8,7 @@ import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import { EditorContentType } from '@/types/editor';
 import { uploadToCloudinary } from '@/lib/uploadToCloudinary';
+import Youtube from '@tiptap/extension-youtube';
 
 export default function useRichTextEditor({
   value,
@@ -25,6 +26,17 @@ export default function useRichTextEditor({
       StarterKit,
       Underline,
       Placeholder.configure({ placeholder }),
+      Youtube.configure({
+        width: 640,
+        height: 360,
+        HTMLAttributes: {
+          class: 'mx-auto my-4 rounded',
+          HTMLAttributes: {
+            class: 'youtube-video',
+            frameborder: '0',
+          },
+        },
+      }),
       Image.configure({ inline: false, allowBase64: false }),
       Link.configure({ openOnClick: true }),
     ],

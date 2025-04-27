@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
@@ -10,16 +10,19 @@ import TextStyle from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
 import TextAlign from '@tiptap/extension-text-align';
 import Highlight from '@tiptap/extension-highlight';
+import Youtube from '@tiptap/extension-youtube';
 import Lightbox from 'yet-another-react-lightbox';
+import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import 'yet-another-react-lightbox/styles.css';
 
-// ✅ 自定义自己的 Slide 类型
 interface MySlide {
   src: string;
   title?: string;
 }
 
 export default function RichContentViewer({ content }: { content: any }) {
+  console.log('RichContentViewer received content:', content);
+
   const [open, setOpen] = useState(false);
   const [slides, setSlides] = useState<MySlide[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -28,6 +31,13 @@ export default function RichContentViewer({ content }: { content: any }) {
     extensions: [
       StarterKit,
       Image.extend({
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            loading: { default: 'lazy' },
+            onclick: { default: null },
+          };
+        },
         renderHTML({ node, HTMLAttributes }) {
           const { src, alt } = node.attrs;
           return [
@@ -50,6 +60,15 @@ export default function RichContentViewer({ content }: { content: any }) {
         },
       }),
       Link,
+      Youtube.configure({
+        width: 640,
+        height: 360,
+        allowFullscreen: true,
+        HTMLAttributes: {
+          class: 'youtube-video',
+          frameborder: '0',
+        },
+      }),
       Underline,
       TextStyle,
       Color,
@@ -60,13 +79,11 @@ export default function RichContentViewer({ content }: { content: any }) {
     content,
   });
 
-  // ⏩ 处理点击图片打开 Lightbox
   const handleImageClickFromDom = useCallback((e: MouseEvent) => {
     const target = e.target as HTMLImageElement;
     if (target.tagName !== 'IMG') return;
 
     const allImages = Array.from(document.querySelectorAll('.tiptap img')) as HTMLImageElement[];
-
     const slidesList: MySlide[] = allImages.map((img) => ({
       src: img.getAttribute('src') || '',
       title: img.getAttribute('alt') || '',
@@ -90,13 +107,6 @@ export default function RichContentViewer({ content }: { content: any }) {
 
   if (!editor) return null;
 
-  function Zoom() {
-    return {
-      onInit: () => {
-        console.log('Zoom plugin initialized');
-      },
-    };
-  }
   return (
     <div className="prose max-w-none tiptap">
       <EditorContent editor={editor} />
@@ -105,10 +115,10 @@ export default function RichContentViewer({ content }: { content: any }) {
         open={open}
         close={() => setOpen(false)}
         slides={slides}
-        plugins={[Zoom]} 
+        plugins={[Zoom]}
         index={currentIndex}
-        carousel={{ finite: false }} 
-        controller={{ closeOnPullDown: true }} 
+        carousel={{ finite: false }}
+        controller={{ closeOnPullDown: true }}
         render={{
           slide: ({ slide }) => {
             const customSlide = slide as MySlide;
@@ -123,11 +133,11 @@ export default function RichContentViewer({ content }: { content: any }) {
                     objectFit: 'contain',
                     borderRadius: '8px',
                     boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
-                    cursor: 'zoom-out', // 鼠标变成缩小图标
+                    cursor: 'zoom-out',
                   }}
                 />
                 {customSlide.title && (
-                  <div className="text-white text-sm mt-2" style={{ textAlign: 'center', fontSize: '1rem' }}>
+                  <div className="text-white text-sm mt-2 text-center">
                     {customSlide.title}
                   </div>
                 )}

@@ -17,7 +17,12 @@ export default function RichTextEditor({
   const [mode, setMode] = useState<'editor' | 'json' | 'html'>('editor');
 
   useEffect(() => {
-    if (editor) setShowToolbar(true);
+    if (editor) {
+      setShowToolbar(true);
+      if (editor.isEmpty) {
+        editor.commands.setContent('<p><br /></p>');
+      }
+    }
   }, [editor]);
 
   const getPreviewContent = () => {
@@ -29,21 +34,25 @@ export default function RichTextEditor({
 
   return (
     <div className="border rounded overflow-hidden bg-white shadow">
+      {/* Toolbar */}
       {showToolbar && editor && <Toolbar editor={editor} />}
 
+      {/* Mode Switch */}
       <div className="flex justify-end px-4 py-1 border-b text-sm text-gray-600">
         <button onClick={() => setMode('editor')} className={mode === 'editor' ? 'font-bold' : ''}>Editor</button>
         <button onClick={() => setMode('json')} className={mode === 'json' ? 'font-bold ml-3' : 'ml-3'}>JSON</button>
         <button onClick={() => setMode('html')} className={mode === 'html' ? 'font-bold ml-3' : 'ml-3'}>HTML</button>
       </div>
 
-      {mode === 'editor' && (
-        <div className="p-4 prose max-w-none min-h-[200px]">
-          <EditorContent editor={editor} />
+      {/* Editor Area */}
+      {mode === 'editor' ? (
+        <div className="p-4 min-h-[300px] cursor-text">
+          <EditorContent
+            editor={editor}
+            className="w-full min-h-[260px] outline-none"
+          />
         </div>
-      )}
-
-      {mode !== 'editor' && (
+      ) : (
         <pre className="bg-gray-100 p-4 overflow-auto text-sm whitespace-pre-wrap text-gray-800">
           {getPreviewContent()}
         </pre>

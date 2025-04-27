@@ -355,3 +355,18 @@ h2 {
   color: #444;
   margin-top: 0.2rem;
 }
+
+.ProseMirror {
+  min-height: 300px;
+  padding: 1rem;
+  outline: none;
+  white-space: pre-wrap;
+  cursor: text;
+}
+
+
+.ProseMirror p:empty::before {
+  content: ' ';
+  display: inline-block;
+  min-height: 1.5em; 
+}
