@@ -8,8 +8,8 @@ import ShareButtons from '@/components/common/ShareButtons';
 
 import { Metadata } from 'next';
 
-export async function generateMetadata({ params }: { params: { category: string; id: string } }): Promise<Metadata> {
-  const { id } = params;
+export async function generateMetadata({ params }: { params: Promise<{ category: string; id: string }> }): Promise<Metadata> {
+  const { id } = await params;
 
   const docRef = adminDb.collection('projects').doc(id);
   const snapshot = await docRef.get();
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: { category: string;
 
   if (layoutRoot && Array.isArray(layoutRoot.content)) {
     const firstImageNode = layoutRoot.content.find((node: any) => node.type === 'image');
-    firstImageUrl = firstImageNode?.attrs?.src; // ← 你的Cloudinary图片链接在attrs.src
+    firstImageUrl = firstImageNode?.attrs?.src;
   }
 
   const ogImage = firstImageUrl || 'https://kaiya-li.dev/og-default.png';
@@ -54,6 +54,7 @@ export async function generateMetadata({ params }: { params: { category: string;
     },
   };
 }
+
 
 
 export default async function ProjectDetailPage(props: {
