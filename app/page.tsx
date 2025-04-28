@@ -31,7 +31,7 @@ export default function Home() {
   <h3 className="employment-header">Areas of my past employment</h3>
 
   <div className="employment-group">
-    <h4>Tech Industry Giant</h4>
+    
     <div className="logo-row">
       <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer">
         <img src="/pics/logo-TikTok.png" alt="TikTok Logo" />
@@ -44,12 +44,8 @@ export default function Home() {
       </a>
     </div>
 
-    <h4>Retail Industry Giant</h4>
-    <div className="logo-row">
-      <a href="https://www.marksandspencer.com/" target="_blank" rel="noopener noreferrer">
-        <img src="/pics/Marks_and_Spencer_MS_logo_logotype_emblem-1826219277.png" alt="M&S Logo" />
-      </a>
-    </div>
+    
+    
 
    
     <Link href="/experiences">

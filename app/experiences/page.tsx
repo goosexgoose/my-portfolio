@@ -99,7 +99,7 @@ export default function CVPage() {
       <div className={styles.buttonGroup}>
         <Link href="/projects" className="btn">See More Projects</Link>
         <ResumeDownloadButton />
-        <Link href="/more" className="btn">Contact Me</Link>
+        <Link href="/contact" className="btn">Contact Me</Link>
       </div>
     </div>
   );
@@ -107,56 +107,3 @@ export default function CVPage() {
 
 
 
-// Work Experience Data
-const workExperiences = [
-  {
-    company: 'ByteDance',
-    logo: '/pics/ByteDance_Logo-1536x265-873688352.png',
-    title: 'Douyin Encyclopaedia - Product Strategy Specialist',
-    responsibilities: [
-      'Responsible for community operations: construction, editor training, growth.',
-      'Set and executed operational goals.',
-      'Collaborated with product/editorial teams for community development.',
-    ],
-    dates: 'Jan 2023 - Jun 2023',
-    type: 'Full-time',
-    location: 'Shenzhen, Guangdong, China',
-  },
-  {
-    company: 'Sina Weibo',
-    logo: '/pics/sina-png-512x512-pixel-512.png',
-    title: 'Product Strategy Specialist',
-    responsibilities: [
-      'Maintained strategic account plans.',
-      'Organised interdepartmental strategies.',
-      'Analyzed user data to improve experience.',
-    ],
-    dates: 'Dec 2020 - Aug 2021',
-    type: 'Full-time',
-    location: 'Beijing, China',
-  },
-  {
-    company: 'TikTok',
-    logo: '/pics/logo-TikTok.png',
-    title: 'International Operations Specialist',
-    responsibilities: [
-      'Managed cross-regional user feedback.',
-      'Provided product support.',
-      'Optimized product workflows to reduce invalid feedback.',
-    ],
-    dates: 'Aug 2018 - Jun 2020',
-    type: 'Full-time',
-    location: 'Beijing, China',
-  },
-  {
-    company: 'Marks & Spencer',
-    logo: '/pics/Marks_and_Spencer_MS_logo_logotype_emblem-1826219277.png',
-    title: 'Customer Assistant',
-    responsibilities: [
-      'Engaged with customers to improve service.',
-    ],
-    dates: 'Dec 2023 - Jan 2024',
-    type: 'Part-time',
-    location: 'Cardiff, Wales, UK',
-  },
-];

@@ -5,12 +5,12 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import PhotographyDetailClient from '@/components/projects/PhotographyDetailClient';
 import NormalDetailClient from '@/components/projects/NormalDetailClient';
 
-interface Props {
-  params: { category: string; id: string };
-}
 
-export default async function ProjectDetailPage({ params }: Props) {
-  const { category, id } = params;
+
+export default async function ProjectDetailPage(props: {
+  params: Promise<{ category: string; id: string }>;
+}) {
+  const { category, id } = await props.params;
 
   const docRef = adminDb.collection('projects').doc(id);
   const snapshot = await docRef.get();
@@ -57,7 +57,6 @@ export default async function ProjectDetailPage({ params }: Props) {
           <p className="text-gray-600">{project.description}</p>
         )}
       </div>
-
 
       {/* Content */}
       {isPhotography ? (

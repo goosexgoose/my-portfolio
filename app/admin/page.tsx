@@ -2,6 +2,7 @@
 
 import AdminTabs from '@/components/admin/AdminTabs';
 import { Toaster } from 'react-hot-toast';
+import { Suspense } from 'react'; 
 
 export default function AdminPage() {
   console.log('Admin page rendered');
@@ -17,7 +18,9 @@ export default function AdminPage() {
 
         {/* Admin Tabs */}
         <main>
-          <AdminTabs />
+          <Suspense fallback={<div>Loading Admin Tabs...</div>}>
+            <AdminTabs />
+          </Suspense>
         </main>
       </div>
 
