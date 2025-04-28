@@ -6,6 +6,8 @@ import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '@/lib/firebaseClient';
 import styles from './register.module.css';
 
+
+
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +22,7 @@ export default function RegisterPage() {
       if (userCredential.user && displayName) {
         await updateProfile(userCredential.user, { displayName });
       }
-      router.replace('/'); // Replace instead of push to avoid new tab and stay in-app
+      router.replace('/'); 
     } catch (err: any) {
       setError(err.message);
     }

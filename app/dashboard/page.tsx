@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { auth } from '@/lib/firebaseClient'; 
 
+
 import {
   onAuthStateChanged,
   updateProfile,

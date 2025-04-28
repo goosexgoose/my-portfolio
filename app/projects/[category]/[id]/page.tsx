@@ -4,7 +4,56 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import PhotographyDetailClient from '@/components/projects/PhotographyDetailClient';
 import NormalDetailClient from '@/components/projects/NormalDetailClient';
+import ShareButtons from '@/components/common/ShareButtons';
 
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: { category: string; id: string } }): Promise<Metadata> {
+  const { id } = params;
+
+  const docRef = adminDb.collection('projects').doc(id);
+  const snapshot = await docRef.get();
+
+  if (!snapshot.exists) {
+    return {
+      title: 'Project Not Found | Kaiya Li Portfolio',
+      description: 'The requested project could not be found. Explore more creative works by Kaiya Li.',
+      openGraph: {
+        images: ['https://kaiya-li.dev/og-default.png'],
+      },
+    };
+  }
+
+  const project = snapshot.data()!;
+  const layoutRoot = project.layout?.en || project.layout?.zh || project.layout || null;
+
+  let firstImageUrl: string | undefined = undefined;
+
+  if (layoutRoot && Array.isArray(layoutRoot.content)) {
+    const firstImageNode = layoutRoot.content.find((node: any) => node.type === 'image');
+    firstImageUrl = firstImageNode?.attrs?.src; // ← 你的Cloudinary图片链接在attrs.src
+  }
+
+  const ogImage = firstImageUrl || 'https://kaiya-li.dev/og-default.png';
+
+  return {
+    title: `${project.title} | Projects | Kaiya Li`,
+    description: project.description || 'Discover this project and more creative works by Kaiya Li.',
+    openGraph: {
+      title: `${project.title} | Projects | Kaiya Li`,
+      description: project.description || 'Discover this project and more creative works by Kaiya Li.',
+      url: `https://kaiya-li.dev/projects/${project.category}/${id}`,
+      type: 'website',
+      images: [ogImage],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${project.title} | Projects | Kaiya Li`,
+      description: project.description || 'Discover this project and more creative works by Kaiya Li.',
+      images: [ogImage],
+    },
+  };
+}
 
 
 export default async function ProjectDetailPage(props: {
@@ -64,6 +113,10 @@ export default async function ProjectDetailPage(props: {
       ) : (
         <NormalDetailClient layout={layout} />
       )}
+      <ShareButtons
+        url={`https://kaiya-li.dev/projects/${category}/${id}`}
+        title={project.title}
+      />
     </div>
   );
 }

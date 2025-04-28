@@ -10,6 +10,8 @@ import FilterControls from '@/components/projects/FilterControls';
 import ProjectCard from '@/components/projects/ProjectCard';
 import PhotographyMasonry from '@/components/gallery/PhotographyMasonry';
 
+
+
 interface Project {
   id: string;
   title: string;

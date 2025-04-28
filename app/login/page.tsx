@@ -7,6 +7,7 @@ import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 
 import { auth } from '@/lib/firebaseClient';
 import styles from './login.module.css';
 
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');

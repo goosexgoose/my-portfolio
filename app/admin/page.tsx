@@ -4,6 +4,7 @@ import AdminTabs from '@/components/admin/AdminTabs';
 import { Toaster } from 'react-hot-toast';
 import { Suspense } from 'react'; 
 
+
 export default function AdminPage() {
   console.log('Admin page rendered');
 

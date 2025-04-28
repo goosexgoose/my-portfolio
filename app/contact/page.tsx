@@ -5,6 +5,7 @@ import { db } from '@/lib/firebaseClient';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import emailjs from 'emailjs-com';
 
+
 export default function ContactPage() {
   const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');

@@ -8,11 +8,14 @@ import Masonry from 'react-masonry-css';
 import Link from 'next/link';
 import LoginOverlay from '@/components/auth/LoginOverlay';
 
+
+
 interface PhotoItem {
   id: string;
   src: string;
   alt?: string;
 }
+
 
 export default function GalleryPage() {
   const [recentWorks, setRecentWorks] = useState<PhotoItem[]>([]);
@@ -94,7 +97,7 @@ export default function GalleryPage() {
       {/* Top Intro */}
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold">Photography Gallery</h1>
-        <p className="text-gray-500 text-sm">Recent Works are public. Full archive available after login.</p>
+        <p> </p>
       </div>
 
       {/* Personal Intro Section */}
