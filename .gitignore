@@ -22,9 +22,7 @@
 *.tsbuildinfo
 next-env.d.ts
 
-# Firebase local setup
-lib/firebaseClient.ts
-lib/firebaseShared.ts
+
 
 # Env
 .env*
