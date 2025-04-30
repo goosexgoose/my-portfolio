@@ -180,7 +180,7 @@ export default function ProjectsPage() {
                     alt: proj.description || '',
                   };
                 })
-                .filter(p => p.src); // 过滤掉没有图片的
+                .filter(p => p.src); 
 
               return (
                 <section key={cat} id={cat.toLowerCase()} className="space-y-6">
@@ -192,7 +192,7 @@ export default function ProjectsPage() {
               );
             }
 
-  // 非Photography的正常走原来的list
+ 
   return (
     <section key={cat} id={cat.toLowerCase()} className="space-y-6">
       <h2 className="text-xl font-semibold">{cat} Projects</h2>
