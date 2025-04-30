@@ -5,7 +5,6 @@ import { db } from '@/lib/firebaseClient';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import emailjs from 'emailjs-com';
 
-
 export default function ContactPage() {
   const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');
@@ -78,11 +77,14 @@ export default function ContactPage() {
             <h2 className="text-xl font-semibold mb-3">Send Me a Message</h2>
             <p className="text-sm text-gray-600 mb-6">Have a question, collab, or feedback?</p>
 
-            {status && (
-              <div className="mb-4 text-sm bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 p-3 rounded">
-                {status}
-              </div>
-            )}
+            {/* 👇 Reserved space to prevent layout shift */}
+            <div className="min-h-[52px] mb-4">
+              {status && (
+                <div className="text-sm bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 p-3 rounded">
+                  {status}
+                </div>
+              )}
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
