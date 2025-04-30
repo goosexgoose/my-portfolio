@@ -36,7 +36,7 @@ export default function PhotographyDetailClient({ layout }: Props) {
   return (
     <div>
       {photos.length === 1 ? (
-        // 如果只有一张照片，居中放大展示
+        
         <div className="flex justify-center">
           <img
             src={photos[0].src}
@@ -47,7 +47,7 @@ export default function PhotographyDetailClient({ layout }: Props) {
           />
         </div>
       ) : (
-        // 多张图走 Masonry
+        
         <Masonry
           breakpointCols={breakpointColumnsObj}
           className="flex gap-4"
