@@ -7,6 +7,7 @@ import Script from 'next/script';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
@@ -68,6 +69,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
         <Footer />
+        <SpeedInsights />
       </body>
     </html>
   );
